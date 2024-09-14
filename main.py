@@ -1,30 +1,20 @@
-from flask import Flask, jsonify
-import psycopg2
-from psycopg2.extras import RealDictCursor
-
-app = Flask(__name__)
-
-# Remote PostgreSQL connection details
-app.config['POSTGRES_URL'] = 'postgresql://yourusername:yourpassword@yourhost:yourport/yourdbname'
+from flask import Flask
+from dotenv import load_dotenv
+from rest.players import players
+import database.db as db
 
 
-def get_db_connection():
-    connection = psycopg2.connect(app.config['POSTGRES_URL'], cursor_factory=RealDictCursor)
-    return connection
+# Create the app
+def create_app():
+    load_dotenv()
+    app = Flask(__name__)
+    app.register_blueprint(players, url_prefix='/players')
+    return app
 
 
-@app.route('/')
-def index():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM public.soccer_players;')
-    results = cur.fetchall()
-    cur.close()
-    conn.close()
-    print(jsonify(results))
-    return jsonify(results)
-
+app = create_app()
 
 if __name__ == '__main__':
+    print("============================Running the app============================")
     app.run(debug=True)
 
