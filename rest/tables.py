@@ -63,6 +63,7 @@ def create_goal_shot_creation_table():
     db.create_tables("""CREATE TABLE public.goal_shot_creation (
                         player_id serial4 NOT NULL,
                         season varchar(10) NOT NULL,
+                        club_id int4 NULL,
                         minute_90s float8 NULL,
                         sca int4 NULL,
                         sca_90 float8 NULL,
@@ -96,6 +97,7 @@ def create_defensive_actions_table():
     db.create_tables("""CREATE TABLE public.defensive_actions (
                         player_id serial4 NOT NULL,
                         season varchar(10) NOT NULL,
+                        club_id int4 NULL,
                         minute_90s float8 NULL,
                         tackles int4 NULL,
                         tackles_won int4 NULL,
@@ -129,6 +131,7 @@ def create_possession_table():
     db.create_tables("""CREATE TABLE public.possession (
                         player_id serial4 NOT NULL,
                         season varchar(10) NOT NULL,
+                        club_id int4 NULL,
                         minute_90s float8 NULL,
                         touches int4 NULL,
                         touches_def_pen_area int4 NULL,
@@ -169,6 +172,7 @@ def create_shots_table():
     db.create_tables("""CREATE TABLE public.shots (
                         player_id serial4 NOT NULL,
                         season varchar(10) NOT NULL,
+                        club_id int4 NULL,
                         minute_90s float8 NULL,
                         goals int4 NULL,
                         shots_total int4 NULL,
