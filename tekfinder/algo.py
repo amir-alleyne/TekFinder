@@ -1,7 +1,11 @@
+from dotenv import load_dotenv
 import numpy as np
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from sklearn.neighbors import NearestNeighbors
+import os
 
-def recommend_players(target_profile, player_data, k):
+def recommend_players(target_profile, player_data, k, real_player_data):
     """Recommends k nearest player profiles based on a target profile.
 
     Args:
@@ -24,13 +28,12 @@ def recommend_players(target_profile, player_data, k):
     print("Distances: ", distances)
 
     # Retrieve the recommended player profiles
-    recommended_players = player_data[indices[0]]
+    recommended_players = real_player_data[indices[0]]
 
     return recommended_players
 
-def recommend_players_weighted(target_profile, player_data):
-    weights = np.array([0.9, 0.05, 0.05])
 
+def recommend_players_weighted(target_profile, player_data, weights):
 
 
     # Calculate the weighted Euclidean distance
@@ -38,9 +41,8 @@ def recommend_players_weighted(target_profile, player_data):
 
     # Find the closest player
     closest_player_index = np.argmin(distances)
-    closest_player = player_data[closest_player_index]
-
-    print("Closest player:", closest_player)
+    return closest_player_index
+   
 
 def preprocess(player_data):
     """Preprocesses the player data by normalizing the features.
@@ -53,20 +55,38 @@ def preprocess(player_data):
     """
 
     # Normalize the player data
+    player_data = np.array([list(row.values()) for row in player_data])
+    
+    # Replace None values with 0
+    player_data[player_data == None] = 0
+ 
+    # Normalize the player data between 0 and 1
+    normalized_player_data = ((player_data - np.min(player_data)) / (np.max(player_data) - np.min(player_data)))[:,1:]
 
-    pass
+    return normalized_player_data, player_data
 
 
 if __name__ == '__main__':
-    # Sample player data
-    player_data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    # normalized_player_data = preprocess(player_data)
-    target_profile = np.array([1, 5, 6])
-
+    
+    load_dotenv()
+    print("============================Connecting to the database=============================")
+    db = psycopg2.connect(
+            f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}",
+            cursor_factory=RealDictCursor
+        )
+    query = "SELECT player_id, goals,shots_total,shots_on_target,shots_on_target_pct,shots_total_per90,shots_on_target_per90,goals_per_shot,goals_per_shot_on_target,avg_shot_distance,shots_free_kicks,pens_made,pens_att,xg,npxg,xg_per_shot,goals_minus_xg,npg_minus_npxg FROM shots s join clubs c on c.club_id = s.club_id where season='2324' and c.league_id=3 limit 500" #order by goals desc
+    cur = db.cursor()
+    cur.execute(query)
+    player_data = cur.fetchall()
+    np.set_printoptions(suppress=True)
+    normalized_player_data, player_data = preprocess(player_data)
+    
     # Number of nearest neighbors to recommend
-    k =2
-
-    # Recommend k nearest player profiles
-    recommended_players = recommend_players_weighted(target_profile, player_data)
+    k = 5
+    target_profile = np.ones(len(normalized_player_data[0]))
+    # # Recommend k nearest player profiles
+    recommended_players = recommend_players(target_profile, normalized_player_data, k, player_data)
+    # ind = recommend_players_weighted(target_profile, normalized_player_data, weights)
+    # print(player_data[ind])
 
     print("Recommended: " , recommended_players)
