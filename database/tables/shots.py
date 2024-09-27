@@ -30,4 +30,5 @@ class Shots(Base):
     xg_per_shot = Column(Float)
     goals_minus_xg = Column(Float)
     npg_minus_npxg = Column(Float)
+
     
