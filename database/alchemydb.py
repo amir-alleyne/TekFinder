@@ -4,6 +4,7 @@ import os
 
 import json
 from database.tables.base import Base
+from tables.shots import Shots
 
 # Database class to manage connections and sessions
 class Database:
@@ -23,6 +24,7 @@ class Database:
         self.engine = create_engine(db_url, future=True)
         Base.metadata.bind = self.engine
         Base.metadata.create_all(self.engine)
+
         # Create a session factory (bind engine later on session instantiation)
         self.SessionLocal = sessionmaker(bind=self.engine, future=True)
 
