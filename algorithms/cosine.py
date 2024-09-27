@@ -34,7 +34,7 @@ find_haaland_query = """SELECT p.name, s.player_id, s.season,
                             ] AS stats_vector
                         FROM public.shots s
                         JOIN public.players p ON s.player_id = p.player_id
-                        WHERE p.name = 'Marcus Rashford' AND s.season = '2324';"""
+                        WHERE p.name = 'Erling Haaland' AND s.season = '2324';"""
 
 max_query = """
             SELECT 
@@ -49,10 +49,10 @@ max_query = """
             """
 
 # haaland = db.fetch(query=find_haaland_query)
-max_player = db.fetch(query=find_haaland_query)
+max_player = db.fetch(query=max_query)
 
 # Replace None values with 0 in Haaland's target vector using list comprehension
-target_vector = np.array([0 if x is None else x for x in max_player[0]['stats_vector']])
+target_vector = np.array([0 if x is None else x for x in max_player[0]['max_stats_vector']])
 
 # Cosine similarity function with division by zero prevention
 def cosine_similarity(a, b):
