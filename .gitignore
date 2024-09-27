@@ -1,2 +1,4 @@
 venv/
 .env
+launch.json
+*.cpython-312.pyc
