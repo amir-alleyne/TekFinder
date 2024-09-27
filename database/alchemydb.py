@@ -4,6 +4,7 @@ import os
 
 import json
 from database.tables.base import Base
+from tables.shots import Shots
 
 # Database class to manage connections and sessions
 class Database:
@@ -96,4 +97,4 @@ class Database:
             session.close()
 
 
-# db = Database()
+
