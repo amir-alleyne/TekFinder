@@ -78,6 +78,8 @@ max_result = db.fetch(query=max_query)
 
 # Convert the max values to a numpy array
 max_stats_vector = np.array(max_result[0]['max_stats_vector'])
+
+max_stats_vector = np.ones(shape=17)
 print(f"Max: {max_stats_vector}")
 # Create the ideal player vector by applying the weights to the max_stats_vector
 ideal_target_vector = max_stats_vector * weights
