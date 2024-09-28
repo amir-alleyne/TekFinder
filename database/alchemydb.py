@@ -1,7 +1,9 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import declarative_base, sessionmaker
 import os
 from tables.shots import Shots
+from tables.players import Players
+import json
 
 
 # Database class to manage connections and sessions
@@ -43,6 +45,37 @@ class Database:
         """Query a table (model)."""
         with self.get_session() as session:
             return session.query(model)
+        
+    def json_search(self, model, json_input):
+        """Search a table with a json query. """
+        with self.get_session() as session:
+            filters = json.loads(json_input)
+
+            query = session.query(model)
+            conditions = []
+            for key, value in filters.items():
+                column = getattr(model, key)
+
+                if isinstance(value, str):
+                    if value.startswith("<="):
+                        conditions.append(column <= int(value[2:]))
+                    elif value.startswith(">="):
+                        conditions.append(column >= int(value[2:]))
+                    elif value.startswith("<"):
+                        conditions.append(column < int(value[1:]))
+                    elif value.startswith(">"):
+                        conditions.append(column > int(value[1:]))
+                    else:
+                        # No operator, assume equality check
+                        conditions.append(column == value)
+                else:
+                    # Handle non-string cases (e.g., integers, floats)
+                    conditions.append(column == value)
+
+            query =  query.filter(and_(*conditions))
+
+            return query.all()
+
 
     def delete(self, instance):
         """Delete an instance."""
@@ -66,11 +99,23 @@ if __name__ == "__main__":
     # Initialize the Database using the .env file
     db = Database()
 
-    # Query players
-    players = db.query(Shots).all()
-    for player in players:
-        if player.player_id == 343:
-            print(player.season)
+    # # Query players
+    # players = db.query(Shots).all()
+    # for player in players:
+    #     if player.player_id == 343:
+    #         print(player.season)
+
+    new_json = {
+        "age": "<27",
+        "club_id": "5"
+    }
+
+    results = db.json_search(Players, json.dumps(new_json))
+
+    for result in results:
+        print(result.name)
+    
+    # print(results)
 
     # Close the session
     db.close()
