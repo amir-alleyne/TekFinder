@@ -81,3 +81,4 @@ def InsertLeagues():
         return jsonify({"error": "No players found"})
     
     return jsonify(league)
+
