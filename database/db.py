@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
+import pandas as pd
 
 class Database:
     """
@@ -28,11 +29,12 @@ class Database:
     def getDB(self):
         return self.connection
     
-    def create_tables(self):
+    def create_table(self, query):
         '''
         Create tables in the database
         '''
-        pass
+        self.cursor.execute(query)
+        self.connection.commit()
 
     def insert(self, query, data):
         '''
@@ -42,8 +44,25 @@ class Database:
         query: SQL query
         data: data to be inserted into the database
         '''
+        # try:
+            # self.cursor = self.connection.cursor()
         self.cursor.execute(query, data)
         self.connection.commit()
+        self.cursor.close()
+        self.connection.close()
+
+
+        # except psycopg2.Error as e:
+        #     # Print the error message for debugging
+        #     print(f"Error: {e}")
+            
+        #     # Rollback the transaction if any command fails
+        #     self.connection.rollback()
+
+        # finally:
+        #     # Clean up and close the cursor and connection
+        #     self.cursor.close()
+        #     self.connection.close()
     
     def fetch(self, query):
         '''
