@@ -26,6 +26,14 @@ def recommend_players(target_profile, player_data, k, real_player_data):
     # Find the k nearest neighbors to the target profile
     distances, indices = knn.kneighbors([target_profile])
     print("Distances: ", distances)
+    d_min = np.min(distances)
+    d_max = np.max(distances)
+
+    # Normalize to a rating between 0 and 100
+    # The reason why I am using 1 as the min distance is because nodes usually should not have a distance closer than 1 unless they are the node themselves
+    ratings = 100 * (1 - (distances - 1) / (d_max - 1))
+
+    print(f"Ratings: {ratings}")
 
     # Retrieve the recommended player profiles
     recommended_players = real_player_data[indices[0]]
@@ -70,7 +78,7 @@ if __name__ == '__main__':
     cur.execute(query)
     player_data = cur.fetchall()
     np.set_printoptions(suppress=True)
-    weights = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 20, 1, 1, 1, 1, 1])
+    weights = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     normalized_player_data, player_data = preprocess(player_data, weights)
     
     # Number of nearest neighbors to recommend
