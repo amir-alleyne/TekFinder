@@ -100,15 +100,15 @@ if __name__ == "__main__":
     # Initialize the Database using the .env file
     db = Database()
 
-players = (
-    db.query(Passing, Players.name)
-    .join(Players, Passing.player_id == Players.player_id)
-    .all()
-)
+    players = (
+        db.query(Passing, Players.name)
+        .join(Players, Passing.player_id == Players.player_id)
+        .all()
+    )
 
-for player, name in players:
-    if player.player_id == 343:
-        print(player.player_id, player.season, player.club_id, player.assists, name)
+    for player, name in players:
+        if player.player_id == 343:
+            print(player.player_id, player.season, player.club_id, player.assists, name)
 
     # new_json = {
     #     "age": "<27",
