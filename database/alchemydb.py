@@ -7,6 +7,7 @@ from tables.passing import Passing
 from tables.goal_shot_creation import GoalShotCreation
 from tables.pass_types import PassTypes
 from tables.defensive_actions import DefensiveActions
+from tables.possession import Possession
 import json
 
 
@@ -128,6 +129,11 @@ if __name__ == "__main__":
     for def_act in defensive_actions:
         if def_act.player_id == 343:
             print(def_act.player_id, def_act.season, def_act.club_id, def_act.tackles, def_act.interceptions)
+
+    possession = db.query(Possession)
+    for poss in possession:
+        if poss.player_id == 343:
+            print(poss.player_id, poss.season, poss.club_id, poss.touches, poss.touches_def_pen_area)
 
     # new_json = {
     #     "age": "<27",
