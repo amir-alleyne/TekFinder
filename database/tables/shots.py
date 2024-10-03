@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, Float, ForeignKey, VARCHAR
+from sqlalchemy import Column, Integer, Float, ForeignKey, VARCHAR
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))

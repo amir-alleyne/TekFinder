@@ -4,6 +4,9 @@ import os
 from tables.shots import Shots
 from tables.players import Players
 from tables.passing import Passing
+from tables.goal_shot_creation import GoalShotCreation
+from tables.pass_types import PassTypes
+from tables.defensive_actions import DefensiveActions
 import json
 
 
@@ -109,6 +112,22 @@ if __name__ == "__main__":
     for player, name in players:
         if player.player_id == 343:
             print(player.player_id, player.season, player.club_id, player.assists, name)
+
+    
+    offense = db.query(GoalShotCreation)
+    for off in offense:
+        if off.player_id == 343:
+            print(off.player_id, off.season, off.club_id, off.gca, off.sca)
+
+    pass_types = db.query(PassTypes)
+    for pass_type in pass_types:
+        if pass_type.player_id == 343:
+            print(pass_type.player_id, pass_type.season, pass_type.club_id, pass_type.live, pass_type.dead)
+
+    defensive_actions = db.query(DefensiveActions)
+    for def_act in defensive_actions:
+        if def_act.player_id == 343:
+            print(def_act.player_id, def_act.season, def_act.club_id, def_act.tackles, def_act.interceptions)
 
     # new_json = {
     #     "age": "<27",
