@@ -3,6 +3,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 import os
 from tables.shots import Shots
 from tables.players import Players
+from tables.passing import Passing
 import json
 
 
@@ -41,10 +42,10 @@ class Database:
             session.add_all(instances)
             session.commit()
 
-    def query(self, model):
-        """Query a table (model)."""
+    def query(self, *models):
+        """Query one or more tables (models)."""
         with self.get_session() as session:
-            return session.query(model)
+            return session.query(*models)
         
     def json_search(self, model, json_input):
         """Search a table with a json query. """
@@ -99,21 +100,25 @@ if __name__ == "__main__":
     # Initialize the Database using the .env file
     db = Database()
 
-    # # Query players
-    # players = db.query(Shots).all()
-    # for player in players:
-    #     if player.player_id == 343:
-    #         print(player.season)
+players = (
+    db.query(Passing, Players.name)
+    .join(Players, Passing.player_id == Players.player_id)
+    .all()
+)
 
-    new_json = {
-        "age": "<27",
-        "club_id": "5"
-    }
+for player, name in players:
+    if player.player_id == 343:
+        print(player.player_id, player.season, player.club_id, player.assists, name)
 
-    results = db.json_search(Players, json.dumps(new_json))
+    # new_json = {
+    #     "age": "<27",
+    #     "club_id": "5"
+    # }
 
-    for result in results:
-        print(result.name)
+    # results = db.json_search(Players, json.dumps(new_json))
+
+    # for result in results:
+    #     print(result.name)
     
     # print(results)
 
