@@ -18,7 +18,8 @@ def recommend_players(target_profile, player_data, k, real_player_data):
     """
 
     # Create a NearestNeighbors object
-    knn = NearestNeighbors(n_neighbors=k, metric='euclidean')
+    knn = NearestNeighbors(n_neighbors=k, metric='manhattan')
+    # knn = NearestNeighbors(n_neighbors=k, metric='euclidean')
 
     # Fit the KNN model to the player data
     knn.fit(player_data)
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     cur.execute(query)
     player_data = cur.fetchall()
     np.set_printoptions(suppress=True)
-    weights = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 20, 1, 1, 1, 1, 1])
+    weights = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     normalized_player_data, player_data = preprocess(player_data, weights)
     
     # Number of nearest neighbors to recommend
