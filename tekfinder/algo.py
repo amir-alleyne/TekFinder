@@ -18,7 +18,8 @@ def recommend_players(target_profile, player_data, k, real_player_data):
     """
 
     # Create a NearestNeighbors object
-    knn = NearestNeighbors(n_neighbors=k, metric='euclidean')
+    knn = NearestNeighbors(n_neighbors=k, metric='manhattan')
+    # knn = NearestNeighbors(n_neighbors=k, metric='euclidean')
 
     # Fit the KNN model to the player data
     knn.fit(player_data)
