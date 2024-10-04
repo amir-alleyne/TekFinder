@@ -576,6 +576,305 @@ class Database:
                 self.cursor.close()
                 self.connection.close()
 
+    def insert_misc_table(self, csv_path):
+                            
+                    create_temp_table_query = """
+                    CREATE TEMP TABLE temp_misc (
+                        league VARCHAR(100),  -- Extra columns from CSV
+                        season VARCHAR(10) NOT NULL,
+                        team VARCHAR(100) NULL,  -- Temporary column to store 'team' from CSV
+                        name VARCHAR(100) NULL,  -- Temporary column to store 'name' from CSV
+                        nation VARCHAR(50) NULL,  -- Extra columns from CSV
+                        pos VARCHAR(10) NULL,     -- Extra columns from CSV
+                        age INTEGER NULL,         -- Extra columns from CSV
+                        born INTEGER NULL,        -- Extra columns from CSV
+                        minute_90s FLOAT8 NULL,
+                        yellow INT4 NULL,
+                        red INT4 NULL,
+                        second_yellow INT4 NULL,
+                        fouls_commit INT4 NULL,
+                        fouls_drawn INT4 NULL,
+                        offside INT4 NULL,
+                        crosses INT4 NULL,
+                        interceptions INT4 NULL,
+                        tackles_won INT4 NULL,
+                        pens_won INT4 NULL,
+                        pens_conceded INT4 NULL,
+                        own_goals INT4 NULL,
+                        ball_recoveries INT4 NULL,
+                        aerials_won INT4 NULL,
+                        aerials_lost INT4 NULL,
+                        aerials_won_pct FLOAT8 NULL
+                    );
+                    """
+            
+                    try:
+                        self.cursor.execute(create_temp_table_query)
+                        print("Temporary table created successfully.")
+            
+                        # Step 2: Load the CSV data into the temporary table
+                        csv_file_path = csv_path
+                        with open(csv_file_path, 'r') as f:
+                            self.cursor.copy_expert("COPY temp_misc FROM STDIN WITH CSV HEADER", f)
+            
+                        # Commit the transaction
+                        self.connection.commit()
+                        print("CSV data inserted into the temporary table.")
+            
+                    except psycopg2.Error as e:
+                        self.connection.rollback()
+                        print(f"Error inserting CSV data: {e}")
+            
+                    # Step 3: Insert relevant data from the temporary table into the main misc table
+                    # Join with 'players' and 'clubs' to get player_id and club_id
+            
+                    insert_into_main_table_query = """
+                    INSERT INTO misc (
+                        player_id, club_id, season, minute_90s, yellow, red, second_yellow, fouls_commit, fouls_drawn, offside, crosses, interceptions,
+                        tackles_won, pens_won, pens_conceded, own_goals, ball_recoveries, aerials_won, aerials_lost, aerials_won_pct
+                    )
+                    SELECT
+                        p.player_id,
+                        c.club_id,
+                        t.season,
+                        t.minute_90s,
+                        t.yellow,
+                        t.red,
+                        t.second_yellow,
+                        t.fouls_commit,
+                        t.fouls_drawn,
+                        t.offside,
+                        t.crosses,
+                        t.interceptions,
+                        t.tackles_won,
+                        t.pens_won,
+                        t.pens_conceded,
+                        t.own_goals,
+                        t.ball_recoveries,
+                        t.aerials_won,
+                        t.aerials_lost,
+                        t.aerials_won_pct
+                    FROM temp_misc t
+                    JOIN players p ON t.name = p.name  -- Map 'name' in CSV to 'name' in players to get player_id
+                    JOIN clubs c ON t.team = c.name  -- Map 'team' in CSV to 'club_name' in clubs to get club_id;
+                    """
+                    try:
+                        self.cursor.execute(insert_into_main_table_query)
+                        self.connection.commit()
+                        print("Data inserted into the misc table successfully.")
+                    except psycopg2.Error as e:
+                        self.connection.rollback()
+                        print(f"Error inserting data into misc: {e}")
+                    finally:
+                        self.cursor.close()
+                        self.connection.close()
+
+    def insert_keepers_table(self, csv_path):
+                                
+            create_temp_table_query = """
+            CREATE TEMP TABLE temp_keepers (
+                league VARCHAR(100),  -- Extra columns from CSV
+                season VARCHAR(10) NOT NULL,
+                club VARCHAR(100) NULL,  -- Temporary column to store 'team' from CSV
+                name VARCHAR(100) NULL,  -- Temporary column to store 'name' from CSV
+                nation VARCHAR(50) NULL,  -- Extra columns from CSV
+                pos VARCHAR(10) NULL,     -- Extra columns from CSV
+                age INTEGER NULL,         -- Extra columns from CSV
+                null1 VARCHAR(50) NULL,        -- Extra columns from CSV
+                null2 VARCHAR(50) NULL,        -- Extra columns from CSV
+                played INT4 NULL,
+                started INT4 NULL,
+                minutes INT4 NULL,
+                minute_90s FLOAT8 NULL,
+                goals_against INT4 NULL,
+                goals_against_per90 FLOAT8 NULL,
+                shots_on_target_against INT4 NULL,
+                saves INT4 NULL,
+                save_pct FLOAT8 NULL,
+                wins INT4 NULL,
+                draws INT4 NULL,
+                losses INT4 NULL,
+                clean_sheets INT4 NULL,
+                clean_sheets_pct FLOAT8 NULL,
+                pens_att INT4 NULL,
+                pens_allowed INT4 NULL,
+                pens_saved INT4 NULL,
+                pens_missed INT4 NULL,
+                pens_saved_pct FLOAT8 NULL
+            );
+            """
+            
+            try:
+                self.cursor.execute(create_temp_table_query)
+                print("Temporary table created successfully.")
+            
+                # Step 2: Load the CSV data into the temporary table
+                csv_file_path = csv_path
+                with open(csv_file_path, 'r') as f:
+                    self.cursor.copy_expert("COPY temp_keepers FROM STDIN WITH CSV HEADER", f)
+            
+                # Commit the transaction
+                self.connection.commit()
+                print("CSV data inserted into the temporary table.")
+            
+            except psycopg2.Error as e:
+                self.connection.rollback()
+                print(f"Error inserting CSV data: {e}")
+            
+            # Step 3: Insert relevant data from the temporary table into the main keepers table
+            # Join with 'players' and 'clubs' to get player_id and club_id
+            
+            insert_into_main_table_query = """
+            INSERT INTO keepers (
+                player_id, club_id, season, minutes, goals_against, goals_against_per90, shots_on_target_against, saves, save_pct,
+                wins, draws, losses, clean_sheets, clean_sheets_pct, pens_att, pens_allowed, pens_saved, pens_missed, pens_saved_pct
+            )
+            SELECT
+                p.player_id,
+                c.club_id,
+                t.season,
+                t.minutes,
+                t.goals_against,
+                t.goals_against_per90,
+                t.shots_on_target_against,
+                t.saves,
+                t.save_pct,
+                t.wins,
+                t.draws,
+                t.losses,
+                t.clean_sheets,
+                t.clean_sheets_pct,
+                t.pens_att,
+                t.pens_allowed,
+                t.pens_saved,
+                t.pens_missed,
+                t.pens_saved_pct
+            FROM temp_keepers t
+            JOIN players p ON t.name = p.name  -- Map 'name' in CSV to 'name' in players to get player_id
+            JOIN clubs c ON t.club = c.name  -- Map 'team' in CSV to 'club_name' in clubs to get club_id;
+            """
+            try:
+                self.cursor.execute(insert_into_main_table_query)
+                self.connection.commit()
+                print("Data inserted into the keepers table successfully.")
+            except psycopg2.Error as e:
+                self.connection.rollback()
+                print(f"Error inserting data into keepers: {e}")
+            finally:
+                self.cursor.close()
+                self.connection.close()
+
+
+    def insert_keeper_adv_table(self, csv_path):
+                                    
+            create_temp_table_query = """
+            CREATE TEMP TABLE temp_keeper_adv (
+                league VARCHAR(100),  -- Extra columns from CSV
+                season VARCHAR(10) NOT NULL,
+                club VARCHAR(100) NULL,  -- Temporary column to store 'team' from CSV
+                name VARCHAR(100) NULL,  -- Temporary column to store 'name' from CSV
+                nation VARCHAR(50) NULL,  -- Extra columns from CSV
+                pos VARCHAR(10) NULL,     -- Extra columns from CSV
+                age INTEGER NULL,         -- Extra columns from CSV
+                born INTEGER NULL,        -- Extra columns from CSV
+                minute_90s FLOAT8 NULL,
+                goals_against INT4 NULL,
+                pk_allowed INT4 NULL,
+                fk_goals_against INT4 NULL,
+                ck_goals_against INT4 NULL,
+                og_against INT4 NULL,
+                psxg FLOAT8 NULL,
+                psxg_per_shot FLOAT8 NULL,
+                psxg_net FLOAT8 NULL,
+                psxg_net_per90 FLOAT8 NULL,
+                launched_passes_completed INT4 NULL,
+                launched_passes_att INT4 NULL,
+                launched_passes_completed_pct FLOAT8 NULL,
+                passes_att_gk INT4 NULL,
+                throws_attempted INT4 NULL,
+                launch_pass_pct FLOAT8 NULL,
+                avg_pass_len FLOAT8 NULL,
+                crosses_faced INT4 NULL,
+                crosses_stopped INT4 NULL,
+                crosses_stopped_pct FLOAT8 NULL,
+                def_act_outside_pen_area INT4 NULL,
+                def_act_outside_pen_area_per90 FLOAT8 NULL,
+                avg_distance_def_actions FLOAT8 NULL
+
+            );
+            """
+            
+            try:
+                self.cursor.execute(create_temp_table_query)
+                print("Temporary table created successfully.")
+            
+                # Step 2: Load the CSV data into the temporary table
+                csv_file_path = csv_path
+                with open(csv_file_path, 'r') as f:
+                    self.cursor.copy_expert("COPY temp_keeper_adv FROM STDIN WITH CSV HEADER", f)
+            
+                # Commit the transaction
+                self.connection.commit()
+                print("CSV data inserted into the temporary table.")
+            
+            except psycopg2.Error as e:
+                self.connection.rollback()
+                print(f"Error inserting CSV data: {e.pgcode}, {e.pgerror}")
+            
+            # Step 3: Insert relevant data from the temporary table into the main keeper_adv table
+            # Join with 'players' and 'clubs' to get player_id and club_id
+            
+            insert_into_main_table_query = """
+            INSERT INTO keeper_adv (
+                player_id, club_id, season, minute_90s, goals_against, pk_allowed, fk_goals_against, ck_goals_against, og_against, psxg,
+                psxg_per_shot, psxg_net, psxg_net_per90, launched_passes_completed, launched_passes_att, launched_passes_completed_pct,
+                passes_att_gk, throws_attempted, launch_pass_pct, avg_pass_len, crosses_faced, crosses_stopped, crosses_stopped_pct,
+                def_act_outside_pen_area, def_act_outside_pen_area_per90, avg_distance_def_actions
+            )
+            SELECT
+                p.player_id,
+                c.club_id,
+                t.season,
+                t.minute_90s,
+                t.goals_against,
+                t.pk_allowed,
+                t.fk_goals_against,
+                t.ck_goals_against,
+                t.og_against,
+                t.psxg,
+                t.psxg_per_shot,
+                t.psxg_net,
+                t.psxg_net_per90,
+                t.launched_passes_completed,
+                t.launched_passes_att,
+                t.launched_passes_completed_pct,
+                t.passes_att_gk,
+                t.throws_attempted,
+                t.launch_pass_pct,
+                t.avg_pass_len,
+                t.crosses_faced,
+                t.crosses_stopped,
+                t.crosses_stopped_pct,
+                t.def_act_outside_pen_area,
+                t.def_act_outside_pen_area_per90,
+                t.avg_distance_def_actions
+            FROM temp_keeper_adv t
+            JOIN players p ON t.name = p.name  -- Map 'name' in CSV to 'name' in players to get player_id
+            JOIN clubs c ON t.club = c.name  -- Map 'team' in CSV to 'club_name' in clubs to get club_id;
+            """
+
+            try:
+                self.cursor.execute(insert_into_main_table_query)
+                self.connection.commit()
+                print("Data inserted into the keeper_adv table successfully.")
+            except psycopg2.Error as e:
+                self.connection.rollback()
+                print(f"Error inserting data into keeper_adv: {e}")
+            finally:
+                self.cursor.close()
+                self.connection.close()
+
+
 db = Database()
 
 
@@ -587,6 +886,9 @@ if __name__ == "__main__":
     # db.insert_defensive_actions_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/defense_copy.csv')
     # db.insert_possession_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/possession_copy.csv')
     # db.insert_shots_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/shooting_copy.csv')
+    # db.insert_misc_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/misc_copy.csv')
+    # db.insert_keepers_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/keeper_copy.csv')
+    db.insert_keeper_adv_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/keeper_adv copy.csv')
 
 
     pass_types_table_query = """CREATE TABLE public.pass_types (
@@ -720,11 +1022,108 @@ if __name__ == "__main__":
                         CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES public.players (player_id),
                         CONSTRAINT fk_club FOREIGN KEY (club_id) REFERENCES public.clubs (club_id)); """
     
+    misc_table_query = """CREATE TABLE public.misc (
+                        player_id serial4 NOT NULL,
+                        season varchar(10) NOT NULL,
+                        club_id int4 NULL,
+                        minute_90s float8 NULL,
+                        yellow int4 NULL,
+                        red int4 NULL,
+                        second_yellow int4 NULL,
+                        fouls_commit int4 NULL,
+                        fouls_drawn int4 NULL,
+                        offside int4 NULL,
+                        crosses int4 NULL,
+                        interceptions int4 NULL,
+                        tackles_won int4 NULL,
+                        pens_won int4 NULL,
+                        pens_conceded int4 NULL,
+                        own_goals int4 NULL,
+                        ball_recoveries int4 NULL,
+                        aerials_won int4 NULL,
+                        aerials_lost int4 NULL,
+                        aerials_won_pct float8 NULL,
+                        CONSTRAINT misc_pkey PRIMARY KEY (player_id, season, club_id),
+                        CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES public.players (player_id),
+                        CONSTRAINT fk_club FOREIGN KEY (club_id) REFERENCES public.clubs (club_id)); """
+    
+    keeper_table_query = """CREATE TABLE public.keepers (
+                        player_id serial4 NOT NULL,
+                        season varchar(10) NOT NULL,
+                        club_id int4 NULL,
+                        minutes float8 NULL,
+                        goals_against int4 NULL,
+                        goals_against_per90 float8 NULL,
+                        shots_on_target_against int4 NULL,
+                        saves int4 NULL,
+                        save_pct float8 NULL,
+                        wins int4 NULL,
+                        draws int4 NULL,
+                        losses int4 NULL,
+                        clean_sheets int4 NULL,
+                        clean_sheets_pct float8 NULL,
+                        pens_att int4 NULL,
+                        pens_allowed int4 NULL,
+                        pens_saved int4 NULL,
+                        pens_missed int4 NULL,
+                        pens_saved_pct float8 NULL,
+                        CONSTRAINT keepers_pkey PRIMARY KEY (player_id, season, club_id),
+                        CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES public.players (player_id),
+                        CONSTRAINT fk_club FOREIGN KEY (club_id) REFERENCES public.clubs (club_id)); """
+    
+
+    keeper_adv_table_query = """CREATE TABLE public.keeper_adv (
+                        player_id serial4 NOT NULL,
+                        season varchar(10) NOT NULL,
+                        club_id int4 NULL,
+                        minute_90s float8 NULL,
+                        goals_against int4 NULL,
+                        pk_allowed int4 NULL,
+                        fk_goals_against int4 NULL,
+                        ck_goals_against int4 NULL,
+                        og_against int4 NULL,
+                        psxg float NULL,
+                        psxg_per_shot float8 NULL,
+                        psxg_net float NULL,
+                        psxg_net_per90 float8 NULL,
+                        launched_passed_completed int4 NULL,
+                        launched_passes_att int4 NULL,
+                        launched_passes_completed int4 NULL,
+                        launched_passes_completed_pct float8 NULL,
+                        passes_att_gk int4 NULL,
+                        throws_attempted int4 NULL,
+                        launch_pass_pct float8 NULL,
+                        avg_pass_len float8 NULL,
+                        crosses_faced int4 NULL,
+                        crosses_stopped int4 NULL,
+                        crosses_stopped_pct float8 NULL,
+                        def_act_outside_pen_area int4 NULL,
+                        def_act_outside_pen_area_per90 float8 NULL,
+                        avg_distance_def_actions int4 NULL,
+
+                        CONSTRAINT keeper_adv_pkey PRIMARY KEY (player_id, season, club_id),
+                        CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES public.players (player_id),
+                        CONSTRAINT fk_club FOREIGN KEY (club_id) REFERENCES public.clubs (club_id)); """
+    
     # db.create_table(pass_types_table_query)
     # db.create_table(defensive_actions_table_query)
     # db.create_table(possession_table_query)
     # db.create_table(shots_table_query)
+    # db.create_table(misc_table_query)
+    # db.create_table(keeper_table_query)
+    # db.create_table(keeper_adv_table_query)
 
     # fl = len(pd.read_csv('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/passing_types_copy.csv'))
     # print(fl)
     # print(fl)
+
+    # with open('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/keeper copy.csv', 'r') as f:
+    #     lines = f.readlines()
+    #     for i in range(3):
+    #         if i == 0:
+    #             print(lines[i].split(','))
+    #         # print(line)
+    #         if i == 1:
+    #             print(lines[i].split(','))
+    #             break
+            
