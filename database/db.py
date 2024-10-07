@@ -1,3 +1,4 @@
+import csv
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -766,7 +767,7 @@ class Database:
 
 
     def insert_keeper_adv_table(self, csv_path):
-                                    
+    
             create_temp_table_query = """
             CREATE TEMP TABLE temp_keeper_adv (
                 league VARCHAR(100),  -- Extra columns from CSV
@@ -794,6 +795,9 @@ class Database:
                 throws_attempted INT4 NULL,
                 launch_pass_pct FLOAT8 NULL,
                 avg_pass_len FLOAT8 NULL,
+                goal_kicks_att FLOAT8 NULL, 
+                goal_kicks_launch_pct FLOAT8 NULL,
+                goal_kicks_avg_len FLOAT8 NULL,
                 crosses_faced INT4 NULL,
                 crosses_stopped INT4 NULL,
                 crosses_stopped_pct FLOAT8 NULL,
@@ -806,12 +810,12 @@ class Database:
             
             try:
                 self.cursor.execute(create_temp_table_query)
-                print("Temporary table created successfully.")
+                # print("Temporary table created successfully.")
             
                 # Step 2: Load the CSV data into the temporary table
                 csv_file_path = csv_path
                 with open(csv_file_path, 'r') as f:
-                    self.cursor.copy_expert("COPY temp_keeper_adv FROM STDIN WITH CSV HEADER", f)
+                    self.cursor.copy_expert("COPY temp_keeper_adv FROM STDIN WITH DELIMITER ',' CSV HEADER", f)
             
                 # Commit the transaction
                 self.connection.commit()
@@ -827,8 +831,9 @@ class Database:
             insert_into_main_table_query = """
             INSERT INTO keeper_adv (
                 player_id, club_id, season, minute_90s, goals_against, pk_allowed, fk_goals_against, ck_goals_against, og_against, psxg,
-                psxg_per_shot, psxg_net, psxg_net_per90, launched_passes_completed, launched_passes_att, launched_passes_completed_pct,
-                passes_att_gk, throws_attempted, launch_pass_pct, avg_pass_len, crosses_faced, crosses_stopped, crosses_stopped_pct,
+                psxg_per_shot, psxg_net, psxg_net_per90, launched_passed_completed, launched_passes_att, launched_passes_completed_pct,
+                passes_att_gk, throws_attempted, launch_pass_pct, avg_pass_len, goal_kicks_att, goal_kicks_launch_pct, goal_kicks_avg_len,
+                crosses_faced, crosses_stopped, crosses_stopped_pct,
                 def_act_outside_pen_area, def_act_outside_pen_area_per90, avg_distance_def_actions
             )
             SELECT
@@ -852,6 +857,9 @@ class Database:
                 t.throws_attempted,
                 t.launch_pass_pct,
                 t.avg_pass_len,
+                t.goal_kicks_att,
+                t.goal_kicks_launch_pct,
+                t.goal_kicks_avg_len,
                 t.crosses_faced,
                 t.crosses_stopped,
                 t.crosses_stopped_pct,
@@ -888,7 +896,7 @@ if __name__ == "__main__":
     # db.insert_shots_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/shooting_copy.csv')
     # db.insert_misc_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/misc_copy.csv')
     # db.insert_keepers_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/keeper_copy.csv')
-    db.insert_keeper_adv_table('/Users/hayknazaryan/Desktop/School/Fall/CSC494/TekFinder/data/keeper_adv copy.csv')
+    db.insert_keeper_adv_table('data/keeper_adv copy.csv')
 
 
     pass_types_table_query = """CREATE TABLE public.pass_types (
@@ -1088,7 +1096,6 @@ if __name__ == "__main__":
                         psxg_net_per90 float8 NULL,
                         launched_passed_completed int4 NULL,
                         launched_passes_att int4 NULL,
-                        launched_passes_completed int4 NULL,
                         launched_passes_completed_pct float8 NULL,
                         passes_att_gk int4 NULL,
                         throws_attempted int4 NULL,
