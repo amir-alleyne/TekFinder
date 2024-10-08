@@ -1,15 +1,15 @@
 from sqlalchemy import create_engine, and_
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import sessionmaker
 import os
-from tables.shots import Shots
-from tables.players import Players
-from tables.passing import Passing
-from tables.goal_shot_creation import GoalShotCreation
-from tables.pass_types import PassTypes
-from tables.defensive_actions import DefensiveActions
-from tables.possession import Possession
+# from tables.shots import Shots
+# from tables.players import Players
+# from tables.passing import Passing
+# from tables.goal_shot_creation import GoalShotCreation
+# from tables.pass_types import PassTypes
+# from tables.defensive_actions import DefensiveActions
+# from tables.possession import Possession
 import json
-
+from database.tables.base import Base
 
 # Database class to manage connections and sessions
 class Database:
@@ -27,6 +27,8 @@ class Database:
 
         # Create an engine that connects to the PostgreSQL AWS instance
         self.engine = create_engine(db_url, future=True)
+        Base.metadata.bind = self.engine
+        Base.metadata.create_all(self.engine)
         # Create a session factory (bind engine later on session instantiation)
         self.SessionLocal = sessionmaker(bind=self.engine, future=True)
 
@@ -99,41 +101,43 @@ class Database:
             session.close()
 
 
+# db = Database()
+
 if __name__ == "__main__":
 
     # Initialize the Database using the .env file
-    db = Database()
+    # db = Database()
 
-    players = (
-        db.query(Passing, Players.name)
-        .join(Players, Passing.player_id == Players.player_id)
-        .all()
-    )
+    # players = (
+    #     db.query(Passing, Players.name)
+    #     .join(Players, Passing.player_id == Players.player_id)
+    #     .all()
+    # )
 
-    for player, name in players:
-        if player.player_id == 343:
-            print(player.player_id, player.season, player.club_id, player.assists, name)
+    # for player, name in players:
+    #     if player.player_id == 343:
+    #         print(player.player_id, player.season, player.club_id, player.assists, name)
 
     
-    offense = db.query(GoalShotCreation)
-    for off in offense:
-        if off.player_id == 343:
-            print(off.player_id, off.season, off.club_id, off.gca, off.sca)
+    # offense = db.query(GoalShotCreation)
+    # for off in offense:
+    #     if off.player_id == 343:
+    #         print(off.player_id, off.season, off.club_id, off.gca, off.sca)
 
-    pass_types = db.query(PassTypes)
-    for pass_type in pass_types:
-        if pass_type.player_id == 343:
-            print(pass_type.player_id, pass_type.season, pass_type.club_id, pass_type.live, pass_type.dead)
+    # pass_types = db.query(PassTypes)
+    # for pass_type in pass_types:
+    #     if pass_type.player_id == 343:
+    #         print(pass_type.player_id, pass_type.season, pass_type.club_id, pass_type.live, pass_type.dead)
 
-    defensive_actions = db.query(DefensiveActions)
-    for def_act in defensive_actions:
-        if def_act.player_id == 343:
-            print(def_act.player_id, def_act.season, def_act.club_id, def_act.tackles, def_act.interceptions)
+    # defensive_actions = db.query(DefensiveActions)
+    # for def_act in defensive_actions:
+    #     if def_act.player_id == 343:
+    #         print(def_act.player_id, def_act.season, def_act.club_id, def_act.tackles, def_act.interceptions)
 
-    possession = db.query(Possession)
-    for poss in possession:
-        if poss.player_id == 343:
-            print(poss.player_id, poss.season, poss.club_id, poss.touches, poss.touches_def_pen_area)
+    # possession = db.query(Possession)
+    # for poss in possession:
+    #     if poss.player_id == 343:
+    #         print(poss.player_id, poss.season, poss.club_id, poss.touches, poss.touches_def_pen_area)
 
     # new_json = {
     #     "age": "<27",
@@ -148,4 +152,6 @@ if __name__ == "__main__":
     # print(results)
 
     # Close the session
-    db.close()
+    # db.close()
+
+    pass
