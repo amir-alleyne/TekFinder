@@ -2,12 +2,9 @@ from sqlalchemy import Column, Integer, ForeignKey, VARCHAR
 from sqlalchemy.orm import declarative_base
 import sys
 import os
-from sqlalchemy.orm import declarative_base
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+from tables.base import Base
 
-
-
-Base = declarative_base()
 
 # Define the Player model (mapping to your 'players' table)
 class Players(Base):
