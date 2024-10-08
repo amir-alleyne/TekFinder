@@ -2,10 +2,8 @@ from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from sqlalchemy.orm import declarative_base, relationship
-
-# Define the base class for models
-Base = declarative_base()
+from tables.base import Base
+from sqlalchemy.orm import declarative_base, relationship, relationship
 
 # Define the Shot model (mapping to your 'shots' table)
 class Shots(Base):

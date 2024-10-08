@@ -95,3 +95,5 @@ class Database:
         with self.get_session() as session:
             session.close()
 
+
+# db = Database()
