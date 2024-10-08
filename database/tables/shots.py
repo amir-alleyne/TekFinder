@@ -2,10 +2,8 @@ from sqlalchemy import Column, Integer, Float, ForeignKey, VARCHAR
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from sqlalchemy.orm import declarative_base
-
-# Define the base class for models
-Base = declarative_base()
+from tables.base import Base
+from sqlalchemy.orm import declarative_base, relationship
 
 # Define the Shot model (mapping to your 'shots' table)
 class Shots(Base):
@@ -32,3 +30,5 @@ class Shots(Base):
     xg_per_shot = Column(Float)
     goals_minus_xg = Column(Float)
     npg_minus_npxg = Column(Float)
+
+    players = relationship('Players', back_populates='shots')
