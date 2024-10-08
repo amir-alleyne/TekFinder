@@ -24,7 +24,6 @@ class Database:
         self.engine = create_engine(db_url, future=True)
         Base.metadata.bind = self.engine
         Base.metadata.create_all(self.engine)
-
         # Create a session factory (bind engine later on session instantiation)
         self.SessionLocal = sessionmaker(bind=self.engine, future=True)
 
