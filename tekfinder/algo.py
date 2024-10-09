@@ -55,9 +55,9 @@ def preprocess(player_data: np.array, weights):
     
     # Replace None values with 0
     player_data[player_data == None] = 0
-    # pd = player_data[:,2:]
+    pd = player_data[:,3:].astype(np.float64)
     # Apply the weights to the player data
-    pd = player_data * weights
+    pd = pd * weights
   
     # Normalize the player data between 0 and 1
     normalized_player_data = ((pd - np.min(pd)) / (np.max(pd) - np.min(pd)))
