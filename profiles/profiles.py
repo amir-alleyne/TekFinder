@@ -12,7 +12,11 @@ from tekfinder.algo import preprocess, recommend_players
 # from database.tables.misc import Misc
 
 player_profiles = {
-    "Target Man": (["shots.goals",
+    "Target Man": ([
+                    "players.player_id",
+                    "players.name",
+                    "shots.season",
+                    "shots.goals",
                     "shots.shots_on_target",
                     "shots.goals_per_shot",
                     "shots.avg_shot_distance",
@@ -30,12 +34,12 @@ player_profiles = {
                         20,
                         20,
                         20,
-                        30,
-                        50,
-                        50,
-                        70,
-                        70,
-                        70
+                        20,
+                        200,
+                        20,
+                        20,
+                        20,
+                        20,
                         # 70,
                         # 70
                         # 20,
@@ -70,28 +74,33 @@ def get_player_stats(input_list, db):
 
         # Dynamically join the table if not already done
         if table_name not in joined_tables:
-            query = query.join(table_alias, Players.player_id == table_alias.player_id)
+            if table_name == "players":
+                continue
+            else:
+                query = query.join(table_alias, (Players.player_id == table_alias.player_id) & (Shots.season == table_alias.season))
+
             joined_tables.add(table_name)
 
         # Add the column to the list of selected columns
         selected_columns.append(getattr(table_alias, column_name))
     
+    selected_columns = [Players.name, Players.player_id] + selected_columns
     # Modify the query to select the desired columns
     query = query.with_entities(*selected_columns)
 
     # Iterate over the list and print the column names
     column_names = [col.key for col in selected_columns]
     print(column_names)
-    print(len(column_names))
-    print(len(player_profiles["Target Man"][1]))
     
     # Execute the query
     results = query.all()
+    results_dict = [dict(zip(column_names, row)) for row in results]
+    # print(results_dict[0])
 
     # Convert the results to a numpy array
     # Replace None with 0 in the results
     cleaned_results = [[0 if value is None else value for value in row] for row in results]
-    print(len(cleaned_results))
+    # print(f"Cleaned: {(cleaned_results)[0][3:]}")
     return np.array(cleaned_results)
 
 
@@ -102,6 +111,8 @@ if __name__ == "__main__":
 
     # for player in get_player_stats(profile[0], db):
     #     print(player)
+
+    # print(get_player_stats(profile[0], db)[:, 3:])
 
     normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
 
