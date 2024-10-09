@@ -8,6 +8,7 @@ from database.alchemydb import Database
 from database.tables.shots import Shots
 from database.tables.possession import Possession
 from database.tables.players import Players
+from tekfinder.algo import preprocess, recommend_players
 # from database.tables.misc import Misc
 
 player_profiles = {
@@ -19,7 +20,7 @@ player_profiles = {
                     "possession.touches_att_pen_area",
                     "possession.passes_received",
                     "possession.progressive_passes_received",
-                    "possession.touches_att_3rd",
+                    "possession.touches_att_3rd"
                     # "misc.offside",
                     # "misc.aerials_won",
                     # "misc.aerials_lost", #LOW
@@ -34,10 +35,13 @@ player_profiles = {
                         50,
                         70,
                         70,
-                        20,
-                        200,
-                        200,
-                        200
+                        70
+                        # 70,
+                        # 70
+                        # 20,
+                        # 200,
+                        # 200,
+                        # 200
                     ])
                     )
 }
@@ -74,11 +78,21 @@ def get_player_stats(input_list, db):
     
     # Modify the query to select the desired columns
     query = query.with_entities(*selected_columns)
+
+    # Iterate over the list and print the column names
+    column_names = [col.key for col in selected_columns]
+    print(column_names)
+    print(len(column_names))
+    print(len(player_profiles["Target Man"][1]))
     
     # Execute the query
     results = query.all()
-    
-    return results
+
+    # Convert the results to a numpy array
+    # Replace None with 0 in the results
+    cleaned_results = [[0 if value is None else value for value in row] for row in results]
+    print(len(cleaned_results))
+    return np.array(cleaned_results)
 
 
 if __name__ == "__main__":
@@ -86,6 +100,10 @@ if __name__ == "__main__":
 
     profile = player_profiles["Target Man"]
 
-    for player in get_player_stats(profile[0], db):
-        print(player.progressive_passes_received)
+    # for player in get_player_stats(profile[0], db):
+    #     print(player)
+
+    normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
+
+    print(recommend_players(np.ones(shape=9), normalized_player_data, 5, player_data))
 

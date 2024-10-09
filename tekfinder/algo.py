@@ -40,7 +40,7 @@ def recommend_players(target_profile, player_data, k, real_player_data):
 
     return recommended_players
 
-def preprocess(player_data, weights):
+def preprocess(player_data: np.array, weights):
     """Preprocesses the player data by normalizing the features.
 
     Args:
@@ -51,13 +51,13 @@ def preprocess(player_data, weights):
     """
 
     # Normalize the player data
-    player_data = np.array([list(row.values()) for row in player_data])
+    # player_data = np.array([list(row.values()) for row in player_data])
     
     # Replace None values with 0
     player_data[player_data == None] = 0
-    pd = player_data[:,2:]
+    # pd = player_data[:,2:]
     # Apply the weights to the player data
-    pd = pd * weights
+    pd = player_data * weights
   
     # Normalize the player data between 0 and 1
     normalized_player_data = ((pd - np.min(pd)) / (np.max(pd) - np.min(pd)))
