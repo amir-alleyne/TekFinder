@@ -1,13 +1,18 @@
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
 import os
-# from tables.shots import Shots
-# from tables.players import Players
-# from tables.passing import Passing
-# from tables.goal_shot_creation import GoalShotCreation
-# from tables.pass_types import PassTypes
-# from tables.defensive_actions import DefensiveActions
-# from tables.possession import Possession
+
+from tables.shots import Shots
+from tables.players import Players
+from tables.passing import Passing
+from tables.goal_shot_creation import GoalShotCreation
+from tables.pass_types import PassTypes
+from tables.defensive_actions import DefensiveActions
+from tables.possession import Possession
+from tables.misc import Misc
+from tables.keepers import Keepers
+from tables.keepers_adv import KeeperAdv
+
 import json
 from database.tables.base import Base
 from tables.shots import Shots
