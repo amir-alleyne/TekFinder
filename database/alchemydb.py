@@ -139,6 +139,10 @@ if __name__ == "__main__":
     #     if poss.player_id == 343:
     #         print(poss.player_id, poss.season, poss.club_id, poss.touches, poss.touches_def_pen_area)
 
+    misc = db.query(Misc)
+    for m in misc:
+        if m.player_id == 343:
+            print(m.player_id, m.season, m.club_id, m.yellow, m.red)
     # new_json = {
     #     "age": "<27",
     #     "club_id": "5"
