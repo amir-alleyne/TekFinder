@@ -9,13 +9,14 @@ from database.tables.shots import Shots
 from database.tables.possession import Possession
 from database.tables.players import Players
 from tekfinder.algo import preprocess, recommend_players
-# from database.tables.misc import Misc
+from database.tables.misc import Misc
 
 player_profiles = {
     "Target Man": ([
                     "players.player_id",
                     "players.name",
                     "shots.season",
+
                     "shots.goals",
                     "shots.shots_on_target",
                     "shots.goals_per_shot",
@@ -24,28 +25,26 @@ player_profiles = {
                     "possession.touches_att_pen_area",
                     "possession.passes_received",
                     "possession.progressive_passes_received",
-                    "possession.touches_att_3rd"
-                    # "misc.offside",
-                    # "misc.aerials_won",
-                    # "misc.aerials_lost", #LOW
-                    # "misc.aerials_won_pct"
+                    "possession.touches_att_3rd",
+                    "misc.offside",
+                    "misc.aerials_won",
+                    "misc.aerials_lost", #LOW
+                    "misc.aerials_won_pct"
                     ],
                     np.array([
+                        50,
+                        40,
+                        20,
+                        80,
                         20,
                         20,
+                        50,
+                        50,
                         20,
                         20,
                         200,
-                        20,
-                        20,
-                        20,
-                        20,
-                        # 70,
-                        # 70
-                        # 20,
-                        # 200,
-                        # 200,
-                        # 200
+                        200,
+                        200
                     ])
                     )
 }
@@ -60,7 +59,7 @@ def get_player_stats(input_list, db):
         "shots": Shots,
         "possession": Possession,
         "players": Players,
-        # "misc": (misc_alias, Misc)
+        "misc": Misc
     }
     joined_tables = set()
 
@@ -116,5 +115,5 @@ if __name__ == "__main__":
 
     normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
 
-    print(recommend_players(np.ones(shape=9), normalized_player_data, 5, player_data))
+    print(recommend_players(np.ones(shape=13), normalized_player_data, 5, player_data))
 
