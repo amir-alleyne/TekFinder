@@ -10,6 +10,8 @@ from database.tables.possession import Possession
 from database.tables.players import Players
 from tekfinder.algo import preprocess, recommend_players
 from database.tables.misc import Misc
+from database.tables.defensive_actions import DefensiveActions
+from database.tables.passing import Passing
 
 player_profiles = {
     "Target Man": ([
@@ -46,6 +48,46 @@ player_profiles = {
                         200,
                         200
                     ])
+                    ),
+    "Box-to-Box": ([
+                    "players.player_id",
+                    "players.name",
+                    "players.season",
+
+                    "passing.completed_passes",
+                    "passing.attempted_passes",
+                    "passing.completed_percent",
+                    "passing.tot_dist",
+                    "passing.progressive_pass_dist",
+                    "passing.assists",
+                    "passing.expected_assists",
+                    "passing.key_passes",
+                    "passing.final_third_passes",
+                    "passing.passes_into_pen_area",
+                    "passing.progressive_passes",
+                    "defensive_actions.tackles",
+                    "defensive_actions.tackles_won",
+                    "defensive_actions.tackles_def_3rd",
+                    "defensive_actions.tackles_mid_3rd",
+                    "defensive_actions.tackles_att_3rd",
+                    "defensive_actions.interceptions",
+                    "defensive_actions.tackles_interceptions",
+                    "defensive_actions.blocks",
+                    "defensive_actions.dribble_tackles",
+                    "defensive_actions.dribble_tackles_pct",
+                    "possession.touches",
+                    "possession.touches_def_pen_area",
+                    "possession.touches_mid_3rd",
+                    "possession.touches_att_3rd",
+                    "possession.carries",
+                    "possession.progressive_carries",
+                    "possession.passes_received",
+                    "possession.progressive_passes_received"
+                    ],
+                    np.array([
+                        20,20,20,20,50,50,50,50,10,10,20,30,30,50,50,50,30,30,20,30,30,40,50,200,100,100,50,50
+
+                    ])
                     )
 }
 
@@ -59,7 +101,9 @@ def get_player_stats(input_list, db):
         "shots": Shots,
         "possession": Possession,
         "players": Players,
-        "misc": Misc
+        "misc": Misc,
+        "passing": Passing,
+        "defensive_actions": DefensiveActions
     }
     joined_tables = set()
 
@@ -76,7 +120,7 @@ def get_player_stats(input_list, db):
             if table_name == "players":
                 continue
             else:
-                query = query.join(table_alias, (Players.player_id == table_alias.player_id) & (Shots.season == table_alias.season))
+                query = query.join(table_alias, (Players.player_id == table_alias.player_id) & (Passing.season == table_alias.season))
 
             joined_tables.add(table_name)
 
@@ -106,7 +150,7 @@ def get_player_stats(input_list, db):
 if __name__ == "__main__":
     db = Database()
 
-    profile = player_profiles["Target Man"]
+    profile = player_profiles["Box-to-Box"]
 
     # for player in get_player_stats(profile[0], db):
     #     print(player)
@@ -115,5 +159,5 @@ if __name__ == "__main__":
 
     normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
 
-    print(recommend_players(np.ones(shape=13), normalized_player_data, 5, player_data))
+    print(recommend_players(np.ones(shape=28), normalized_player_data, 5, player_data))
 
