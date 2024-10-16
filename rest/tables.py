@@ -1,7 +1,7 @@
 import math
 from flask import Blueprint, jsonify
 import psycopg2
-from database.db import db
+from app import db
 import pandas as pd
 
 
