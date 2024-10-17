@@ -17,7 +17,8 @@ player_profiles = {
     "Target Man": ([
                     "players.player_id",
                     "players.name",
-                    "shots.season",
+                    
+                    "misc.season",
 
                     "shots.goals",
                     "shots.shots_on_target",
@@ -52,7 +53,8 @@ player_profiles = {
     "Box-to-Box": ([
                     "players.player_id",
                     "players.name",
-                    "players.season",
+                    
+                    "misc.season",
 
                     "passing.completed_passes",
                     "passing.attempted_passes",
@@ -66,7 +68,7 @@ player_profiles = {
                     "passing.passes_into_pen_area",
                     "passing.progressive_passes",
                     "defensive_actions.tackles",
-                    "defensive_actions.tackles_won",
+                    "defensive_actions.tackles_won", # aggregate all the values from a table and then compare with the aggregate
                     "defensive_actions.tackles_def_3rd",
                     "defensive_actions.tackles_mid_3rd",
                     "defensive_actions.tackles_att_3rd",
@@ -85,7 +87,7 @@ player_profiles = {
                     "possession.progressive_passes_received"
                     ],
                     np.array([
-                        20,20,20,20,50,50,50,50,10,10,20,30,30,50,50,50,30,30,20,30,30,40,50,200,100,100,50,50
+                        20,20,20,20,50,50,50,50,10,10,20,30,30,50,50,50,30,30,20,30,30,40,50,200,200,200,50,50,50
 
                     ])
                     )
@@ -111,21 +113,20 @@ def get_player_stats(input_list, db):
     selected_columns = []
     for item in input_list:
         table_name, column_name = item.split('.')
-        
         # Get the table alias
-        table_alias = table_mapping[table_name]
+        table = table_mapping[table_name]
 
         # Dynamically join the table if not already done
         if table_name not in joined_tables:
             if table_name == "players":
                 continue
             else:
-                query = query.join(table_alias, (Players.player_id == table_alias.player_id) & (Passing.season == table_alias.season))
+                query = query.join(table, (Players.player_id == table.player_id) & (Misc.season == table.season) & (Misc.club_id == table.club_id))
 
             joined_tables.add(table_name)
 
         # Add the column to the list of selected columns
-        selected_columns.append(getattr(table_alias, column_name))
+        selected_columns.append(getattr(table, column_name))
     
     selected_columns = [Players.name, Players.player_id] + selected_columns
     # Modify the query to select the desired columns
@@ -150,7 +151,7 @@ def get_player_stats(input_list, db):
 if __name__ == "__main__":
     db = Database()
 
-    profile = player_profiles["Box-to-Box"]
+    profile = player_profiles["Target Man"]
 
     # for player in get_player_stats(profile[0], db):
     #     print(player)
@@ -159,5 +160,5 @@ if __name__ == "__main__":
 
     normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
 
-    print(recommend_players(np.ones(shape=28), normalized_player_data, 5, player_data))
+    print(recommend_players(np.ones(shape=13), normalized_player_data, 10, player_data))
 
