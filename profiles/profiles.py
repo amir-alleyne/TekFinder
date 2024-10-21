@@ -12,6 +12,7 @@ from tekfinder.algo import preprocess, recommend_players
 from database.tables.misc import Misc
 from database.tables.defensive_actions import DefensiveActions
 from database.tables.passing import Passing
+from database.tables.keepers_adv import KeeperAdv
 
 player_profiles = {
     "Target Man": ([
@@ -221,6 +222,20 @@ player_profiles = {
                 np.array([
                     # Whats the best way to make sure one of the values is as low as possible?
                     150,120,100,100,80,120,0,140,70,90,40
+                ])),
+    
+    "Sweeper Keeper": ([
+                    "players.player_id",
+                    "players.name",
+
+                    "misc.season",
+
+                    "keeper_adv.def_act_outside_pen_area",
+                    "keeper_adv.def_act_outside_pen_area_per90",
+                    "keeper_adv.avg_distance_def_actions"
+                ],
+                np.array([
+                    100,200,70
                 ]))
 }
 
@@ -236,7 +251,8 @@ def get_player_stats(input_list, db):
         "players": Players,
         "misc": Misc,
         "passing": Passing,
-        "defensive_actions": DefensiveActions
+        "defensive_actions": DefensiveActions,
+        "keeper_adv": KeeperAdv
     }
     joined_tables = set()
 
@@ -282,7 +298,7 @@ def get_player_stats(input_list, db):
 if __name__ == "__main__":
     db = Database()
 
-    profile = player_profiles["Poacher"]
+    profile = player_profiles["Sweeper Keeper"]
 
     # for player in get_player_stats(profile[0], db):
     #     print(player)
@@ -305,5 +321,5 @@ if __name__ == "__main__":
         1,
     ])
 
-    print(recommend_players(poacher_np, normalized_player_data, 10, player_data))
+    print(recommend_players(np.ones(3), normalized_player_data, 10, player_data))
 
