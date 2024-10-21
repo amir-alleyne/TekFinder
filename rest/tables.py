@@ -1,6 +1,6 @@
 import math
 from flask import Blueprint, jsonify
-import psycopg2
+from sqlalchemy import text
 from app import db
 import pandas as pd
 
@@ -18,9 +18,18 @@ def print_tables():
     '''
     Print all tables in the database
     '''
-    db.cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
-    tables = db.cursor.fetchall()
-    return jsonify(tables)
+    query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+    result = db.session.execute(query)
+    table_names = [row[0] for row in result.fetchall()]
+
+    tables_info = {}
+    for table_name in table_names:
+        column_query = text(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}';")
+        column_result = db.session.execute(column_query)
+        column_names = [row[0] for row in column_result.fetchall()]
+        tables_info[table_name] = column_names
+
+    return jsonify(tables_info)
 
 @tables.route('/create_pass_types_table')
 def create_pass_types_table():
