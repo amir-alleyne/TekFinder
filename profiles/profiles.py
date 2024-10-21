@@ -146,7 +146,7 @@ player_profiles = {
                     "possession.carries_into_penalty_area"
                     ],
                     np.array([
-                        150,80,100,90,80,70,30,30,20,30,40,70,70,60
+                        150,80,150,90,80,70,30,30,20,30,40,70,70,60
                     ])),
     
     "False 9": ([
@@ -239,7 +239,11 @@ player_profiles = {
                 ]))
 }
 
-def get_player_stats(input_list, db):
+def get_player_stats(input_list, db, season=None):
+    """
+    This function is responsible for fetching the stats of players given a database db and an input list of wanted stats.
+    Also you can input a string representing a season if wanted
+    """
     # Define aliases for the tables to make joins
     # Initialize the base query for Player
     query = db.query(Players)
@@ -259,6 +263,7 @@ def get_player_stats(input_list, db):
     # Join tables and add columns based on input_list
     selected_columns = []
     for item in input_list:
+        # Split the table name and column name
         table_name, column_name = item.split('.')
         # Get the table alias
         table = table_mapping[table_name]
@@ -266,15 +271,21 @@ def get_player_stats(input_list, db):
         # Dynamically join the table if not already done
         if table_name not in joined_tables:
             if table_name == "players":
+                # Skip the players table
                 continue
             else:
-                query = query.join(table, (Players.player_id == table.player_id) & (Misc.season == table.season) & (Misc.club_id == table.club_id))
+                if season:
+                    query = query.join(table, (Players.player_id == table.player_id) & (Misc.season == table.season) & (Misc.club_id == table.club_id) & (table.season == season))
+                else:
+                    # Join the tables together with each iteration
+                    query = query.join(table, (Players.player_id == table.player_id) & (Misc.season == table.season) & (Misc.club_id == table.club_id))
 
             joined_tables.add(table_name)
 
         # Add the column to the list of selected columns
         selected_columns.append(getattr(table, column_name))
     
+    # Add the name and player_id to the output
     selected_columns = [Players.name, Players.player_id] + selected_columns
     # Modify the query to select the desired columns
     query = query.with_entities(*selected_columns)
@@ -298,7 +309,7 @@ def get_player_stats(input_list, db):
 if __name__ == "__main__":
     db = Database()
 
-    profile = player_profiles["Sweeper Keeper"]
+    profile = player_profiles["False 9"]
 
     # for player in get_player_stats(profile[0], db):
     #     print(player)
@@ -321,5 +332,5 @@ if __name__ == "__main__":
         1,
     ])
 
-    print(recommend_players(np.ones(3), normalized_player_data, 10, player_data))
+    print(recommend_players(np.ones(12), normalized_player_data, 20, player_data))
 
