@@ -67,6 +67,7 @@ player_profiles = {
                     "passing.final_third_passes",
                     "passing.passes_into_pen_area",
                     "passing.progressive_passes",
+
                     "defensive_actions.tackles",
                     "defensive_actions.tackles_won", # aggregate all the values from a table and then compare with the aggregate
                     "defensive_actions.tackles_def_3rd",
@@ -77,6 +78,7 @@ player_profiles = {
                     "defensive_actions.blocks",
                     "defensive_actions.dribble_tackles",
                     "defensive_actions.dribble_tackles_pct",
+
                     "possession.touches",
                     "possession.touches_def_pen_area",
                     "possession.touches_mid_3rd",
@@ -90,7 +92,61 @@ player_profiles = {
                         20,20,20,20,50,50,50,50,10,10,20,30,30,50,50,50,30,30,20,30,30,40,50,200,200,200,50,50,50
 
                     ])
-                    )
+                    ),
+    "Deep Lying Playmaker": ([
+                    "players.player_id",
+                    "players.name",
+
+                    "misc.season",
+
+                    "passing.attempted_passes",
+                    "passing.completed_passes",
+                    "passing.long_completed",
+                    "passing.long_completed_percent",
+                    "passing.key_passes",
+                    "passing.progressive_passes",
+
+                    "defensive_actions.tackles",
+                    "defensive_actions.interceptions",
+                    "defensive_actions.tackles_interceptions",
+                    
+                    "possession.touches",
+                    "possession.touches_def_3rd",
+                    "possession.touches_mid_3rd",
+                    "possession.carries",
+                    "possession.total_carry_distance",
+                    "possession.passes_received"],
+                    np.array([
+                        100,200,80,100,50,90,30,40,30,100,100,150,80,50,60
+                    ])
+    ),
+
+    "Playmaker": ([
+                    "players.player_id",
+                    "players.name",
+
+                    "misc.season",
+
+                    "passing.key_passes",
+                    "passing.assists",
+                    "passing.expected_assists",
+                    "passing.final_third_passes",
+                    "passing.passes_into_pen_area",
+                    "passing.progressive_passes",
+
+                    "shots.goals",
+                    "shots.shots_total",
+                    "shots.avg_shot_distance",
+                    "shots.xg",
+
+                    "possession.dribbles_completed",
+                    "possession.touches_att_3rd",
+                    "possession.carries_into_final_third",
+                    "possession.carries_into_penalty_area"
+                    ],
+                    np.array([
+                        150,80,100,90,80,70,30,30,20,30,40,70,70,60
+                    ]))
 }
 
 def get_player_stats(input_list, db):
@@ -151,7 +207,7 @@ def get_player_stats(input_list, db):
 if __name__ == "__main__":
     db = Database()
 
-    profile = player_profiles["Target Man"]
+    profile = player_profiles["Playmaker"]
 
     # for player in get_player_stats(profile[0], db):
     #     print(player)
@@ -160,5 +216,5 @@ if __name__ == "__main__":
 
     normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
 
-    print(recommend_players(np.ones(shape=13), normalized_player_data, 10, player_data))
+    print(recommend_players(np.ones(shape=14), normalized_player_data, 10, player_data))
 
