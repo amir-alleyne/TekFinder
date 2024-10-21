@@ -146,7 +146,82 @@ player_profiles = {
                     ],
                     np.array([
                         150,80,100,90,80,70,30,30,20,30,40,70,70,60
-                    ]))
+                    ])),
+    
+    "False 9": ([
+                    "players.player_id",
+                    "players.name",
+
+                    "misc.season",
+
+                    "passing.completed_passes",
+                    "passing.final_third_passes",
+                    "passing.key_passes",
+                    "passing.assists",
+                    "passing.expected_assists",
+
+                    "shots.goals",
+                    "shots.shots_total",
+                    "shots.xg",
+
+                    "possession.dribbles_completed",
+                    "possession.touches_mid_3rd",
+                    "possession.touches_att_3rd",
+                    "possession.carries_into_final_third"
+                ],
+                np.array([
+                    30,70,60,80,80,200,100,150,80,75,75,80
+                ])),
+    
+    "Inverted Fullback": ([
+                    "players.player_id",
+                    "players.name",
+
+                    "misc.season",
+
+                    "passing.completed_passes",
+                    "passing.medium_completed",
+                    "passing.final_third_passes",
+                    "passing.crosses_into_pen_area",
+
+                    "defensive_actions.tackles",
+                    "defensive_actions.tackles_won",
+                    "defensive_actions.tackles_mid_3rd",
+                    "defensive_actions.interceptions",
+                    "defensive_actions.blocks",
+
+                    "possession.touches",
+                    "possession.touches_mid_3rd",
+                    "possession.carries",
+                    "possession.passes_received"
+                    ],
+                    np.array([
+                        60,70,40,40,60,60,70,50,50,70,80,60,60
+                    ])),
+    
+    "Poacher": ([
+                    "players.player_id",
+                    "players.name",
+
+                    "misc.season",
+
+                    "shots.goals",
+                    "shots.xg",
+                    "shots.npxg",
+                    "shots.shots_total",
+                    "shots.shots_on_target",
+                    "shots.goals_per_shot",
+                    "shots.avg_shot_distance",
+
+                    "possession.touches_att_pen_area",
+                    "possession.dribbles_completed",
+                    "possession.passes_received",
+                    "misc.pens_won"
+                ],
+                np.array([
+                    # Whats the best way to make sure one of the values is as low as possible?
+                    150,120,100,100,80,120,0,140,70,90,40
+                ]))
 }
 
 def get_player_stats(input_list, db):
@@ -207,7 +282,7 @@ def get_player_stats(input_list, db):
 if __name__ == "__main__":
     db = Database()
 
-    profile = player_profiles["Playmaker"]
+    profile = player_profiles["Poacher"]
 
     # for player in get_player_stats(profile[0], db):
     #     print(player)
@@ -216,5 +291,19 @@ if __name__ == "__main__":
 
     normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
 
-    print(recommend_players(np.ones(shape=14), normalized_player_data, 10, player_data))
+    poacher_np = np.array([
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+    ])
+
+    print(recommend_players(poacher_np, normalized_player_data, 10, player_data))
 
