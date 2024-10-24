@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey, VARCHAR
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from sqlalchemy import Column, Integer, ForeignKey, VARCHAR
+from sqlalchemy.orm import declarative_base
 import sys
 import os
 from sqlalchemy.orm import declarative_base
@@ -18,3 +18,4 @@ class Players(Base):
     age = Column(Integer)
     nationality = Column(VARCHAR)
     club_id = Column(Integer, ForeignKey('clubs.club_id'))
+    position = Column(VARCHAR)

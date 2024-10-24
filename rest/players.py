@@ -1,10 +1,10 @@
 import json
 from flask import Blueprint, jsonify, request
+import numpy as np
 from database.tables.players import Players
 from app import db
-from sqlalchemy import create_engine, and_
-from sqlalchemy.orm import declarative_base, sessionmaker
-
+from profiles.profiles import player_profiles, get_player_stats
+from tekfinder.algo import preprocess, recommend_players
 
 players_end = Blueprint('players', __name__)
 
@@ -16,7 +16,7 @@ def GetPlayers():
     """
    
     data = request.args.to_dict()
-    results = json_search(Players, json.dumps(data))
+    results = db.json_search(Players, json.dumps(data))
     if not results:
         return jsonify({"error": "No players found"})
     results = [result.__dict__ for result in results]
@@ -25,33 +25,23 @@ def GetPlayers():
         result.pop('_sa_instance_state')
     return jsonify([json.loads(json.dumps(result, ensure_ascii=False)) for result in results])
 
-  
+@players_end.route('/profiles', methods=['GET'])
+def GetProfilePlayers():
+    data = request.args.to_dict()
+    if data == {}:
+        return jsonify(["Error: Please enter a profile"])
+    
+    profile = player_profiles[data['profile']] if data['profile'] in player_profiles else []
+    if profile == []:
+        return jsonify(["Error: Please enter a correct profile"])
 
-def json_search(model, json_input):
-    """Search a table with a json query. """
-    filters = json.loads(json_input)
 
-    query = db.session.query(model)
-    conditions = []
-    for key, value in filters.items():
-        column = getattr(model, key)
+    stats = get_player_stats(profile[0], db)
+    normalized_player_data, player_data = preprocess(stats, profile[1])
+    n = len(profile[1])
 
-        if isinstance(value, str):
-            if value.startswith("<="):
-                conditions.append(column <= int(value[2:]))
-            elif value.startswith(">="):
-                conditions.append(column >= int(value[2:]))
-            elif value.startswith("<"):
-                conditions.append(column < int(value[1:]))
-            elif value.startswith(">"):
-                conditions.append(column > int(value[1:]))
-            else:
-                # No operator, assume equality check
-                conditions.append(column == value)
-        else:
-            # Handle non-string cases (e.g., integers, floats)
-            conditions.append(column == value)
-
-    query =  query.filter(and_(*conditions))
-
-    return query.all()
+    target = np.ones(n)
+    result = recommend_players(target, normalized_player_data, 20, player_data)
+   
+   
+    return jsonify([json.loads(json.dumps(res[0], ensure_ascii=False)) for res in result])
