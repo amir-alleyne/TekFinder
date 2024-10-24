@@ -37,13 +37,14 @@ def GetProfilePlayers():
 
     del data['profile']
     
-    res = search_and_filter(Players, db, json.dumps(data), input_list=profile[0])
-    if len(res) == 0:
-        return jsonify({"error": "No players found"})
     json_search_results = db.json_search(Players, json.dumps(data))
+    if not json_search_results:
+        return jsonify({"error": "No players found"})
+    
     for result in json_search_results:
         result.__dict__.pop('_sa_instance_state')
     json_search_player_ids = [result.player_id for result in json_search_results]
+
     stats = get_player_stats(profile[0], db, player_ids=json_search_player_ids)
 
     if len(stats) == 0:
