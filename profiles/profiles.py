@@ -1,8 +1,9 @@
 import numpy as np
 import sys
 import os
+
+from sqlalchemy import and_
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from database.alchemydb import Database
 from database.tables.players import Players
 from database.tables.shots import Shots
 from database.tables.possession import Possession
@@ -238,7 +239,7 @@ player_profiles = {
                 ]))
 }
 
-def get_player_stats(input_list, db, season=None):
+def get_player_stats(input_list, db, season=None, player_ids=None):
     """
     This function is responsible for fetching the stats of players given a database db and an input list of wanted stats.
     Also you can input a string representing a season if wanted
@@ -291,7 +292,8 @@ def get_player_stats(input_list, db, season=None):
 
     # Iterate over the list and print the column names
     column_names = [col.key for col in selected_columns]
-    
+    if player_ids:
+        query = query.filter(Players.player_id.in_(player_ids))
     # Execute the query
     results = query.all()
     results_dict = [dict(zip(column_names, row)) for row in results]

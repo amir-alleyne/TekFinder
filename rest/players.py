@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 import numpy as np
 from database.tables.players import Players
 from app import db
-from profiles.profiles import player_profiles, get_player_stats
+from profiles.profiles import player_profiles, get_player_stats, search_and_filter
 from tekfinder.algo import preprocess, recommend_players
 
 players_end = Blueprint('players', __name__)
@@ -35,8 +35,20 @@ def GetProfilePlayers():
     if profile == []:
         return jsonify(["Error: Please enter a correct profile"])
 
+    del data['profile']
+    
+    res = search_and_filter(Players, db, json.dumps(data), input_list=profile[0])
+    if len(res) == 0:
+        return jsonify({"error": "No players found"})
+    json_search_results = db.json_search(Players, json.dumps(data))
+    for result in json_search_results:
+        result.__dict__.pop('_sa_instance_state')
+    json_search_player_ids = [result.player_id for result in json_search_results]
+    stats = get_player_stats(profile[0], db, player_ids=json_search_player_ids)
 
-    stats = get_player_stats(profile[0], db)
+    if len(stats) == 0:
+        return jsonify({"error": "No players found"})
+    
     normalized_player_data, player_data = preprocess(stats, profile[1])
     n = len(profile[1])
 
@@ -44,4 +56,4 @@ def GetProfilePlayers():
     result = recommend_players(target, normalized_player_data, 20, player_data)
    
    
-    return jsonify([json.loads(json.dumps(res[0], ensure_ascii=False)) for res in result])
+    return jsonify([json.loads(json.dumps([res[0],res[2]], ensure_ascii=False)) for res in result])
