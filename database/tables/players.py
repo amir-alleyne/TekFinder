@@ -18,4 +18,4 @@ class Players(Base):
     age = Column(Integer)
     nationality = Column(VARCHAR)
     club_id = Column(Integer, ForeignKey('clubs.club_id'))
-    position = Column(VARCHAR)
+    pos = Column(VARCHAR)
