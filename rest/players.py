@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 import numpy as np
 from database.tables.players import Players
 from app import db
-from profiles.profiles import player_profiles, get_player_stats, search_and_filter
+from profiles.profiles import player_profiles, get_player_stats
 from tekfinder.algo import preprocess, recommend_players
 
 players_end = Blueprint('players', __name__)
