@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, VARCHAR
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import declarative_base
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
@@ -18,7 +18,3 @@ class Players(Base):
     nationality = Column(VARCHAR)
     club_id = Column(Integer, ForeignKey('clubs.club_id'))
     pos = Column(VARCHAR)
-
-
-    shots = relationship('Shots', back_populates='players')
-
