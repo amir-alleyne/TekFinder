@@ -16,386 +16,288 @@ from database.tables.keepers_adv import KeeperAdv
 from database.tables.goal_shot_creation import GoalShotCreation
 
 player_profiles = {
-    "Target Man": ([
-                    "players.player_id",
-                    "players.name",
-                    
-                    "misc.season",
-
-                    "shots.goals",
-                    "shots.shots_on_target",
-                    "shots.goals_per_shot",
-                    "shots.avg_shot_distance",
-                    "shots.xg",
-                    "possession.touches_att_pen_area",
-                    "possession.passes_received",
-                    "possession.progressive_passes_received",
-                    "possession.touches_att_3rd",
-                    "misc.offside",
-                    "misc.aerials_won",
-                    "misc.aerials_lost", #LOW
-                    "misc.aerials_won_pct"
-                    ],
-                    np.array([
-                        50,
-                        40,
-                        20,
-                        80,
-                        20,
-                        20,
-                        50,
-                        50,
-                        20,
-                        20,
-                        200,
-                        200,
-                        200
-                    ])
-                    ),
-    "Box-to-Box": ([
-                    "players.player_id",
-                    "players.name",
-                    
-                    "misc.season",
-
-                    "passing.completed_passes",
-                    "passing.attempted_passes",
-                    "passing.completed_percent",
-                    "passing.tot_dist",
-                    "passing.progressive_pass_dist",
-                    "passing.assists",
-                    "passing.expected_assists",
-                    "passing.key_passes",
-                    "passing.final_third_passes",
-                    "passing.passes_into_pen_area",
-                    "passing.progressive_passes",
-
-                    "defensive_actions.tackles",
-                    "defensive_actions.tackles_won",
-                    "defensive_actions.tackles_def_3rd",
-                    "defensive_actions.tackles_mid_3rd",
-                    "defensive_actions.tackles_att_3rd",
-                    "defensive_actions.interceptions",
-                    "defensive_actions.tackles_interceptions",
-                    "defensive_actions.blocks",
-                    "defensive_actions.dribble_tackles",
-                    "defensive_actions.dribble_tackles_pct",
-
-                    "possession.touches",
-                    "possession.touches_def_pen_area",
-                    "possession.touches_mid_3rd",
-                    "possession.touches_att_3rd",
-                    "possession.carries",
-                    "possession.progressive_carries",
-                    "possession.passes_received",
-                    "possession.progressive_passes_received"
-                    ],
-                    np.array([
-                        20,20,20,20,50,50,50,50,10,10,20,30,30,50,50,50,30,30,20,30,30,40,50,200,200,200,50,50,50
-
-                    ])
-                    ),
-    "Deep Lying Playmaker": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "passing.attempted_passes",
-                    "passing.completed_passes",
-                    "passing.long_completed",
-                    "passing.long_completed_percent",
-                    "passing.key_passes",
-                    "passing.progressive_passes",
-
-                    "defensive_actions.tackles",
-                    "defensive_actions.interceptions",
-                    "defensive_actions.tackles_interceptions",
-                    
-                    "possession.touches",
-                    "possession.touches_def_3rd",
-                    "possession.touches_mid_3rd",
-                    "possession.carries",
-                    "possession.total_carry_distance",
-                    "possession.passes_received"],
-                    np.array([
-                        100,200,80,100,50,90,30,40,30,100,100,150,80,50,60
-                    ])
-    ),
-
-    "Playmaker": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "passing.key_passes",
-                    "passing.assists",
-                    "passing.expected_assists",
-                    "passing.final_third_passes",
-                    "passing.passes_into_pen_area",
-                    "passing.progressive_passes",
-
-                    "shots.goals",
-                    "shots.shots_total",
-                    "shots.avg_shot_distance",
-                    "shots.xg",
-
-                    "possession.dribbles_completed",
-                    "possession.touches_att_3rd",
-                    "possession.carries_into_final_third",
-                    "possession.carries_into_penalty_area"
-                    ],
-                    np.array([
-                        150,80,150,90,80,70,30,30,20,30,40,70,70,60
-                    ])),
-    
-    "False 9": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "passing.completed_passes",
-                    "passing.final_third_passes",
-                    "passing.key_passes",
-                    "passing.assists",
-                    "passing.expected_assists",
-
-                    "shots.goals",
-                    "shots.shots_total",
-                    "shots.xg",
-
-                    "possession.dribbles_completed",
-                    "possession.touches_mid_3rd",
-                    "possession.touches_att_3rd",
-                    "possession.carries_into_final_third"
-                ],
-                np.array([
-                    30,70,60,80,80,200,100,150,80,75,75,80
-                ])),
-    
-    "Inverted Fullback": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "passing.completed_passes",
-                    "passing.medium_completed",
-                    "passing.final_third_passes",
-                    "passing.crosses_into_pen_area",
-
-                    "defensive_actions.tackles",
-                    "defensive_actions.tackles_won",
-                    "defensive_actions.tackles_mid_3rd",
-                    "defensive_actions.interceptions",
-                    "defensive_actions.blocks",
-
-                    "possession.touches",
-                    "possession.touches_mid_3rd",
-                    "possession.carries",
-                    "possession.passes_received"
-                    ],
-                    np.array([
-                        60,70,40,40,60,60,70,50,50,70,80,60,60
-                    ])),
-    
-    "Poacher": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "shots.goals",
-                    "shots.xg",
-                    "shots.npxg",
-                    "shots.shots_total",
-                    "shots.shots_on_target",
-                    "shots.goals_per_shot",
-                    "shots.avg_shot_distance",
-
-                    "possession.touches_att_pen_area",
-                    "possession.dribbles_completed",
-                    "possession.passes_received",
-                    "misc.pens_won"
-                ],
-                np.array([
-                    # Whats the best way to make sure one of the values is as low as possible?
-                    150,120,100,100,80,120,0,140,70,90,40
-                ])),
-    
-    "Sweeper Keeper": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "keeper_adv.def_act_outside_pen_area",
-                    "keeper_adv.def_act_outside_pen_area_per90",
-                    "keeper_adv.avg_distance_def_actions"
-                ],
-                np.array([
-                    100,200,70
-                ])),
-    
-    "Playmaking Keeper": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "keeper_adv.launched_passed_completed",
-                    "keeper_adv.launched_passes_att",
-                    "keeper_adv.launched_passes_completed_pct",
-                    "keeper_adv.passes_att_gk",
-                    "keeper_adv.throws_attempted",
-                    "keeper_adv.launch_pass_pct",
-                    "keeper_adv.avg_pass_len",
-
-                    "possession.touches",
-                    "possession.touches_def_pen_area",
-                    "possession.touches_def_3rd",
-                    "possession.touches_live_ball",
-                    
-                    "passing.completed_passes",
-                    "passing.attempted_passes",
-                    "passing.completed_percent",
-                    "passing.assists"
-                ],
-                np.array([
-                    90,80,110,120,70,80,80,300,80,80,80,200,100,100,1000
-                ])),
-    
-    "Tricky Winger": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "possession.touches_mid_3rd",
-                    "possession.touches_att_3rd",
-                    "possession.touches_att_pen_area",
-                    "possession.touches_live_ball",
-                    "possession.dribbles",
-                    "possession.dribbles_completed",
-                    "possession.dribbles_completed_pct",
-                    "possession.tackled_during_takeon", # LOW
-                    "possession.carries",
-                    "possession.total_carry_distance",
-                    "possession.progressive_carries",
-                    "possession.carries_into_final_third",
-                    "possession.carries_into_penalty_area",
-                    "possession.dispossessed", # LOW
-
-                    "passing.expected_assisted_goals",
-                    "passing.expected_assists",
-                    "passing.assists_minus_expected_goals_assisted",
-
-                    "misc.crosses",
-
-                    "goalshotcreation.to_gca",
-                    "goalshotcreation.to_sca",
-                    "goalshotcreation.sca_90",
-                    "goalshotcreation.gca_90"
-                ],
-                np.array([
-                    50,70,80,70,1000,280,145,90,95,80,100,80,80,150,140,70,80,80,90,90,90,90
-                ])),
-
-    "Ball Playing Centreback": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "passing.completed_passes",
-                    "passing.attempted_passes",
-                    "passing.completed_percent",
-
-                    "possession.touches",
-                    "possession.touches_def_pen_area",
-                    "possession.touches_def_3rd",
-                    "possession.touches_mid_3rd",
-                    "possession.touches_live_ball",
-                    "possession.dribbles",
-                    "possession.dribbles_completed",
-                    "possession.dribbles_completed_pct",
-                    "possession.tackled_during_takeon", # LOW
-                    "possession.carries",
-                    "possession.total_carry_distance",
-                    "possession.progressive_carries",
-                    "possession.dispossessed", #LOW
-
-                    "defensive_actions.tackles",
-                    "defensive_actions.tackles_won",
-                    "defensive_actions.tackles_def_3rd",
-                    "defensive_actions.dribble_tackles_pct",
-                    "defensive_actions.dribbles_vs",
-                    "defensive_actions.dribble_tackles",
-                    "defensive_actions.dribbled_past" #LOW
-                ],
-                np.array([
-                    150,140,120,100,110,110,70,80,60,60,60,60,90,90,90,60,85,85,85,85,85,85,70
-                ])),
-
-    "Traditional Centreback": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "defensive_actions.tackles",
-                    "defensive_actions.tackles_won",
-                    "defensive_actions.tackles_def_3rd",
-                    "defensive_actions.dribble_tackles_pct",
-                    "defensive_actions.dribbles_vs",
-                    "defensive_actions.dribble_tackles",
-                    "defensive_actions.dribbled_past", #LOW
-                    "defensive_actions.blocks",
-                    "defensive_actions.blocked_shots",
-                    "defensive_actions.blocked_passes",
-                    "defensive_actions.interceptions",
-                    "defensive_actions.tackles_interceptions",
-                    "defensive_actions.errors", # LOW
-
-                    "misc.pens_conceded", # LOW
-                    "misc.aerials_won",
-                    "misc.aerials_won_pct"
-
-                ],
-                np.array([
-                    120,180,90,110,90,90,90,100,100,100,90,80,100,60,140,140
-                ])),
-
-    "Traditional Fullback": ([
-                    "players.player_id",
-                    "players.name",
-
-                    "misc.season",
-
-                    "misc.crosses",
-                    "misc.ball_recoveries",
-
-                    "defensive_actions.tackles",
-                    "defensive_actions.tackles_won",
-                    "defensive_actions.tackles_def_3rd",
-                    "defensive_actions.dribble_tackles_pct",
-                    "defensive_actions.dribbles_vs",
-                    "defensive_actions.dribble_tackles",
-                    "defensive_actions.dribbled_past", # LOW
-                    "defensive_actions.blocked_passes",
-                    "defensive_actions.interceptions",
-
-                    "possession.touches_def_3rd",
-                    "possession.touches_mid_3rd",
-                    "possession.progressive_carries",
-                    "possession.total_carry_distance"
-                ],
-                np.array([
-                    150,100,90,90,90,90,90,90,90,90,80,70,70,80,80
-                ]))
+    "Target Man": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("shots.goals", 200),
+        ("shots.shots_on_target", 80),
+        ("shots.goals_per_shot", 20),
+        ("shots.avg_shot_distance", 50),
+        ("shots.xg", 20),
+        ("possession.touches_att_pen_area", 20),
+        ("possession.passes_received", 50),
+        ("possession.progressive_passes_received", 50),
+        ("possession.touches_att_3rd", 20),
+        ("misc.offside", 20),
+        ("misc.aerials_won", 300),
+        ("misc.aerials_lost", 200),
+        ("misc.aerials_won_pct", 200),
+    ],
+    "Box-to-Box": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("passing.completed_passes", 20),
+        ("passing.attempted_passes", 20),
+        ("passing.completed_percent", 20),
+        ("passing.tot_dist", 20),
+        ("passing.progressive_pass_dist", 50),
+        ("passing.assists", 50),
+        ("passing.expected_assists", 50),
+        ("passing.key_passes", 50),
+        ("passing.final_third_passes", 10),
+        ("passing.passes_into_pen_area", 10),
+        ("passing.progressive_passes", 20),
+        ("defensive_actions.tackles", 30),
+        ("defensive_actions.tackles_won", 30),
+        ("defensive_actions.tackles_def_3rd", 50),
+        ("defensive_actions.tackles_mid_3rd", 50),
+        ("defensive_actions.tackles_att_3rd", 50),
+        ("defensive_actions.interceptions", 30),
+        ("defensive_actions.tackles_interceptions", 30),
+        ("defensive_actions.blocks", 20),
+        ("defensive_actions.dribble_tackles", 30),
+        ("defensive_actions.dribble_tackles_pct", 30),
+        ("possession.touches", 40),
+        ("possession.touches_def_pen_area", 50),
+        ("possession.touches_mid_3rd", 200),
+        ("possession.touches_att_3rd", 200),
+        ("possession.carries", 200),
+        ("possession.progressive_carries", 50),
+        ("possession.passes_received", 50),
+        ("possession.progressive_passes_received", 50),
+    ],
+    "Deep Lying Playmaker": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("passing.attempted_passes", 100),
+        ("passing.completed_passes", 200),
+        ("passing.long_completed", 80),
+        ("passing.long_completed_percent", 100),
+        ("passing.key_passes", 50),
+        ("passing.progressive_passes", 90),
+        ("defensive_actions.tackles", 30),
+        ("defensive_actions.interceptions", 40),
+        ("defensive_actions.tackles_interceptions", 30),
+        ("possession.touches", 100),
+        ("possession.touches_def_3rd", 100),
+        ("possession.touches_mid_3rd", 150),
+        ("possession.carries", 80),
+        ("possession.total_carry_distance", 50),
+        ("possession.passes_received", 60),
+    ],
+    "Playmaker": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("passing.key_passes", 150),
+        ("passing.assists", 80),
+        ("passing.expected_assists", 150),
+        ("passing.final_third_passes", 90),
+        ("passing.passes_into_pen_area", 80),
+        ("passing.progressive_passes", 70),
+        ("shots.goals", 30),
+        ("shots.shots_total", 30),
+        ("shots.avg_shot_distance", 20),
+        ("shots.xg", 30),
+        ("possession.dribbles_completed", 40),
+        ("possession.touches_att_3rd", 70),
+        ("possession.carries_into_final_third", 70),
+        ("possession.carries_into_penalty_area", 60),
+    ],
+    "False 9": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("passing.completed_passes", 30),
+        ("passing.final_third_passes", 70),
+        ("passing.key_passes", 60),
+        ("passing.assists", 80),
+        ("passing.expected_assists", 80),
+        ("shots.goals", 200),
+        ("shots.shots_total", 100),
+        ("shots.xg", 150),
+        ("possession.dribbles_completed", 80),
+        ("possession.touches_mid_3rd", 75),
+        ("possession.touches_att_3rd", 75),
+        ("possession.carries_into_final_third", 80),
+    ],
+    "Inverted Fullback": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("passing.completed_passes", 60),
+        ("passing.medium_completed", 70),
+        ("passing.final_third_passes", 40),
+        ("passing.crosses_into_pen_area", 40),
+        ("defensive_actions.tackles", 60),
+        ("defensive_actions.tackles_won", 60),
+        ("defensive_actions.tackles_mid_3rd", 70),
+        ("defensive_actions.interceptions", 50),
+        ("defensive_actions.blocks", 50),
+        ("possession.touches", 70),
+        ("possession.touches_mid_3rd", 80),
+        ("possession.carries", 60),
+        ("possession.passes_received", 60),
+    ],
+    "Poacher": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("shots.goals", 150),
+        ("shots.xg", 120),
+        ("shots.npxg", 100),
+        ("shots.shots_total", 100),
+        ("shots.shots_on_target", 80),
+        ("shots.goals_per_shot", 120),
+        ("shots.avg_shot_distance", 0),
+        ("possession.touches_att_pen_area", 140),
+        ("possession.dribbles_completed", 70),
+        ("possession.passes_received", 90),
+        ("misc.pens_won", 40),
+    ],
+    "Sweeper Keeper": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("keeper_adv.def_act_outside_pen_area", 100),
+        ("keeper_adv.def_act_outside_pen_area_per90", 200),
+        ("keeper_adv.avg_distance_def_actions", 70),
+    ],
+    "Playmaking Keeper": [
+        ("players.player_id", None),
+        ("players.name", None),
+        ("misc.season", None),
+        ("keeper_adv.launched_passed_completed", 90),
+        ("keeper_adv.launched_passes_att", 80),
+        ("keeper_adv.launched_passes_completed_pct", 110),
+        ("keeper_adv.passes_att_gk", 120),
+        ("keeper_adv.throws_attempted", 70),
+        ("keeper_adv.launch_pass_pct", 80),
+        ("keeper_adv.avg_pass_len", 80),
+        ("possession.touches", 300),
+        ("possession.touches_def_pen_area", 80),
+        ("possession.touches_def_3rd", 80),
+        ("possession.touches_live_ball", 80),
+        ("passing.completed_passes", 200),
+        ("passing.attempted_passes", 100),
+        ("passing.completed_percent", 100),
+        ("passing.assists", 1000),
+    ],
+    "Tricky Winger": [
+    ("players.player_id", None),
+    ("players.name", None),
+    ("misc.season", None),
+    ("possession.touches_mid_3rd", 50),
+    ("possession.touches_att_3rd", 70),
+    ("possession.touches_att_pen_area", 80),
+    ("possession.touches_live_ball", 70),
+    ("possession.dribbles", 1000),
+    ("possession.dribbles_completed", 280),
+    ("possession.dribbles_completed_pct", 145),
+    ("possession.tackled_during_takeon", 90),
+    ("possession.carries", 95),
+    ("possession.total_carry_distance", 80),
+    ("possession.progressive_carries", 100),
+    ("possession.carries_into_final_third", 80),
+    ("possession.carries_into_penalty_area", 80),
+    ("possession.dispossessed", 150),
+    ("passing.expected_assisted_goals", 140),
+    ("passing.expected_assists", 70),
+    ("passing.assists_minus_expected_goals_assisted", 80),
+    ("misc.crosses", 80),
+    ("goalshotcreation.to_gca", 90),
+    ("goalshotcreation.to_sca", 90),
+    ("goalshotcreation.sca_90", 90),
+    ("goalshotcreation.gca_90", 90),
+],
+"Ball Playing Centreback": [
+    ("players.player_id", None),
+    ("players.name", None),
+    ("misc.season", None),
+    ("passing.completed_passes", 150),
+    ("passing.attempted_passes", 140),
+    ("passing.completed_percent", 120),
+    ("possession.touches", 100),
+    ("possession.touches_def_pen_area", 110),
+    ("possession.touches_def_3rd", 110),
+    ("possession.touches_mid_3rd", 70),
+    ("possession.touches_live_ball", 80),
+    ("possession.dribbles", 60),
+    ("possession.dribbles_completed", 60),
+    ("possession.dribbles_completed_pct", 60),
+    ("possession.tackled_during_takeon", 90),
+    ("possession.carries", 90),
+    ("possession.total_carry_distance", 90),
+    ("possession.progressive_carries", 60),
+    ("possession.dispossessed", 85),
+    ("defensive_actions.tackles", 85),
+    ("defensive_actions.tackles_won", 85),
+    ("defensive_actions.tackles_def_3rd", 85),
+    ("defensive_actions.dribble_tackles_pct", 85),
+    ("defensive_actions.dribbles_vs", 85),
+    ("defensive_actions.dribble_tackles", 85),
+    ("defensive_actions.dribbled_past", 70),
+],
+"Traditional Centreback": [
+    ("players.player_id", None),
+    ("players.name", None),
+    ("misc.season", None),
+    ("defensive_actions.tackles", 120),
+    ("defensive_actions.tackles_won", 180),
+    ("defensive_actions.tackles_def_3rd", 90),
+    ("defensive_actions.dribble_tackles_pct", 110),
+    ("defensive_actions.dribbles_vs", 90),
+    ("defensive_actions.dribble_tackles", 90),
+    ("defensive_actions.dribbled_past", 90),
+    ("defensive_actions.blocks", 100),
+    ("defensive_actions.blocked_shots", 100),
+    ("defensive_actions.blocked_passes", 100),
+    ("defensive_actions.interceptions", 90),
+    ("defensive_actions.tackles_interceptions", 80),
+    ("defensive_actions.errors", 100),
+    ("misc.pens_conceded", 60),
+    ("misc.aerials_won", 140),
+    ("misc.aerials_won_pct", 140),
+],
+"Traditional Fullback": [
+    ("players.player_id", None),
+    ("players.name", None),
+    ("misc.season", None),
+    ("misc.crosses", 150),
+    ("misc.ball_recoveries", 100),
+    ("defensive_actions.tackles", 90),
+    ("defensive_actions.tackles_won", 90),
+    ("defensive_actions.tackles_def_3rd", 90),
+    ("defensive_actions.dribble_tackles_pct", 90),
+    ("defensive_actions.dribbles_vs", 90),
+    ("defensive_actions.dribble_tackles", 90),
+    ("defensive_actions.dribbled_past", 90),
+    ("defensive_actions.blocked_passes", 90),
+    ("defensive_actions.interceptions", 90),
+    ("possession.touches_def_3rd", 80),
+    ("possession.touches_mid_3rd", 70),
+    ("possession.progressive_carries", 70),
+    ("possession.total_carry_distance", 80),
+]
 }
+
+def get_profile_weights(profile: list) -> np.array:
+    """Input the player_profile list of tuples and get the weights as a numpy array. """
+    final = []
+    for stat in profile:
+        # Have to make sure the weight is not None
+        if stat[1]:
+            final.append(stat[1])
+    return np.array(final)
+
+def get_profile_attribute_list(profile: list) -> list:
+    """Input the player_profile list of tuples and get the attributes list. """
+
+    return [x[0] for x in profile]
+
 
 def get_player_stats(input_list, db, season=None, player_ids=None):
     """
@@ -418,6 +320,7 @@ def get_player_stats(input_list, db, season=None, player_ids=None):
         "goalshotcreation": GoalShotCreation
     }
     joined_tables = set()
+
 
     # Join tables and add columns based on input_list
     selected_columns = []

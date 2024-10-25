@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 import numpy as np
 from database.tables.players import Players
 from app import db
-from profiles.profiles import player_profiles, get_player_stats
+from profiles.profiles import player_profiles, get_player_stats, get_profile_attribute_list, get_profile_weights
 from tekfinder.algo import preprocess, recommend_players
 
 players_end = Blueprint('players', __name__)
@@ -45,13 +45,15 @@ def GetProfilePlayers():
         result.__dict__.pop('_sa_instance_state')
     json_search_player_ids = [result.player_id for result in json_search_results]
 
-    stats = get_player_stats(profile[0], db, player_ids=json_search_player_ids)
+    stats = get_player_stats(get_profile_attribute_list(profile), db, player_ids=json_search_player_ids)
 
     if len(stats) == 0:
         return jsonify({"error": "No players found"})
     
-    normalized_player_data, player_data = preprocess(stats, profile[1])
-    n = len(profile[1])
+    profile_weights = get_profile_weights(profile)
+    print(f"Weights: {profile_weights}")
+    normalized_player_data, player_data = preprocess(stats, profile_weights)
+    n = len(profile_weights)
 
     target = np.ones(n)
     result = recommend_players(target, normalized_player_data, 20, player_data)
