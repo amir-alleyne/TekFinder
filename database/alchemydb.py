@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker
 import os
 
 import json
@@ -22,6 +23,9 @@ class Database:
 
         # Create an engine that connects to the PostgreSQL AWS instance
         self.engine = create_engine(db_url, future=True)
+        Base.metadata.bind = self.engine
+        Base.metadata.create_all(self.engine)
+
         Base.metadata.bind = self.engine
         Base.metadata.create_all(self.engine)
 

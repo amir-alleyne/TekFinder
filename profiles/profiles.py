@@ -1,13 +1,13 @@
 import numpy as np
 import sys
 import os
-from sqlalchemy.orm import aliased
-from sqlalchemy import select, func
+
+from sqlalchemy import and_
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
-from database.alchemydb import Database
+from database.tables.players import Players
 from database.tables.shots import Shots
 from database.tables.possession import Possession
-from database.tables.players import Players
+
 from tekfinder.algo import preprocess, recommend_players
 from database.tables.misc import Misc
 from database.tables.defensive_actions import DefensiveActions
@@ -239,7 +239,7 @@ player_profiles = {
                 ]))
 }
 
-def get_player_stats(input_list, db, season=None):
+def get_player_stats(input_list, db, season=None, player_ids=None):
     """
     This function is responsible for fetching the stats of players given a database db and an input list of wanted stats.
     Also you can input a string representing a season if wanted
@@ -247,7 +247,7 @@ def get_player_stats(input_list, db, season=None):
     # Define aliases for the tables to make joins
     # Initialize the base query for Player
     query = db.query(Players)
-
+   
     # Dictionary to map table names to their corresponding SQLAlchemy models and aliases
     table_mapping = {
         "shots": Shots,
@@ -292,45 +292,16 @@ def get_player_stats(input_list, db, season=None):
 
     # Iterate over the list and print the column names
     column_names = [col.key for col in selected_columns]
-    print(column_names)
-    
+    if player_ids:
+        query = query.filter(Players.player_id.in_(player_ids))
     # Execute the query
     results = query.all()
     results_dict = [dict(zip(column_names, row)) for row in results]
-    # print(results_dict[0])
 
     # Convert the results to a numpy array
     # Replace None with 0 in the results
     cleaned_results = [[0 if value is None else value for value in row] for row in results]
-    # print(f"Cleaned: {(cleaned_results)[0][3:]}")
+
     return np.array(cleaned_results)
 
-
-if __name__ == "__main__":
-    db = Database()
-
-    profile = player_profiles["False 9"]
-
-    # for player in get_player_stats(profile[0], db):
-    #     print(player)
-
-    # print(get_player_stats(profile[0], db)[:, 3:])
-
-    normalized_player_data, player_data = preprocess(get_player_stats(profile[0], db), profile[1])
-
-    poacher_np = np.array([
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-    ])
-
-    print(recommend_players(np.ones(12), normalized_player_data, 20, player_data))
 

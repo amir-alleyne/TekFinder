@@ -1,8 +1,7 @@
-from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey, VARCHAR
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from sqlalchemy import Column, Integer, ForeignKey, VARCHAR
+from sqlalchemy.orm import declarative_base, relationship
 import sys
 import os
-from sqlalchemy.orm import declarative_base
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 
@@ -18,5 +17,8 @@ class Players(Base):
     age = Column(Integer)
     nationality = Column(VARCHAR)
     club_id = Column(Integer, ForeignKey('clubs.club_id'))
+    pos = Column(VARCHAR)
 
-Players.shots = relationship('Shots', back_populates='players')
+
+    shots = relationship('Shots', back_populates='players')
+

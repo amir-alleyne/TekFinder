@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey, VARCHAR
+from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey, VARCHAR
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.orm import declarative_base, relationship
 
 # Define the base class for models
