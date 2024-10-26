@@ -3,10 +3,14 @@ from flask import Blueprint, jsonify, request
 import numpy as np
 from database.tables.players import Players
 from app import db
-from profiles.profiles import player_profiles, get_player_stats, get_profile_attribute_list, get_profile_weights
+from profiles.profiles import get_player_stats, get_profile_attribute_list, get_profile_weights
 from tekfinder.algo import preprocess, recommend_players
 
 players_end = Blueprint('players', __name__)
+
+with open('rest/profiles.json', 'r') as json_file:
+    player_profiles = json.load(json_file)
+
 
 # GET request to retrieve players with specific attributes
 @players_end.route('/', methods=['GET'])
