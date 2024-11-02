@@ -40,17 +40,17 @@ def GetProfilePlayers():
     except KeyError:
         pass
     
-    data = {'profile': data['profile']}
-    
-    if data == {}:
+    profile_input = {'profile': data['profile']}
+   
+    if profile_input == {}:
         return jsonify(["Error: Please enter a profile"])
     
-    profile = player_profiles[data['profile']] if data['profile'] in player_profiles else []
+    profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
     if profile == []:
         return jsonify(["Error: Please enter a correct profile"])
 
     del data['profile']
-    
+   
     json_search_results = db.json_search(Players, json.dumps(data))
     if not json_search_results:
         return jsonify({"error": "No players found"})
