@@ -1,5 +1,4 @@
-from app import create_app, db
-import requests
+from app import create_app
 from rest.players import players_end
 from rest.tables import tables
 
