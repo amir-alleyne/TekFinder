@@ -67,17 +67,13 @@ def GetProfilePlayers():
         return jsonify({"error": "No players found"})
     
     profile_weights = get_profile_weights(profile)
-    print(f"Weights: {profile_weights}")
-    normalized_player_data, player_data = preprocess(stats, profile_weights)
+    normalized_player_data, player_data = preprocess(stats, profile_weights, profile)
     n = len(profile_weights)
 
     target = np.ones(n)
     result = recommend_players(target, normalized_player_data, 20, player_data)
 
     profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:]
-
-    print(f"attributes: {profile_attributes_list}")
-    print(f"stats: {result[0]}")
 
     if verbose:
         final_list = []
