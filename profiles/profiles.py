@@ -17,12 +17,14 @@ from database.tables.goal_shot_creation import GoalShotCreation
 
 
 
-def get_profile_weights(profile: list) -> np.array:
+def get_profile_weights(profile: list, verbose=False) -> np.array:
     """Input the player_profile list of tuples and get the weights as a numpy array. """
     final = []
     for stat in profile:
         # Have to make sure the weight is not None
-        if stat[1]:
+        if verbose:
+            final.append(stat)
+        elif stat[1]:
             final.append(stat[1])
     return np.array(final)
 
