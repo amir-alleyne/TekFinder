@@ -177,7 +177,7 @@
         ["possession.touches_att_3rd", 70, false],
         ["possession.touches_att_pen_area", 80, false],
         ["possession.touches_live_ball", 70, false],
-        ["possession.dribbles", 1000, false],
+        ["possession.dribbles", 800, false],
         ["possession.dribbles_completed", 280, false],
         ["possession.dribbles_completed_pct", 145, false],
         ["possession.tackled_during_takeon", 90, false],
