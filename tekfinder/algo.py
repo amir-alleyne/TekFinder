@@ -63,7 +63,7 @@ def preprocess(player_data: np.array, weights, attributes=None):
     # Normalize the player data between 0 and 1
     normalized_player_data = ((pd - np.min(pd)) / (np.max(pd) - np.min(pd)))
     if attributes:
-        invert = [i for i, attr in enumerate(attributes) if attr[1] is not None and attr[2]]
+        invert = [i-3 for i, attr in enumerate(attributes) if attr[1] is not None and attr[2]]
         for i in invert:
             normalized_player_data[:,i] = 1 - normalized_player_data[:,i]
      

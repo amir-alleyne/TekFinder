@@ -3,7 +3,7 @@
         ["players.player_id", null, false],
         ["players.name", null, false],
         ["misc.season", null, false],
-        ["shots.goals", 200, false],
+        ["shots.goals", 150, false],
         ["shots.shots_on_target", 80, false],
         ["shots.goals_per_shot", 20, false],
         ["shots.avg_shot_distance", 50, false],
@@ -14,7 +14,7 @@
         ["possession.touches_att_3rd", 20, false],
         ["misc.offside", 20, false],
         ["misc.aerials_won", 300, false],
-        ["misc.aerials_lost", 200, false],
+        ["misc.aerials_lost", 50, true],
         ["misc.aerials_won_pct", 200, false]
     ],
     "Box-to-Box": [
@@ -240,7 +240,7 @@
         ["defensive_actions.blocked_passes", 100, false],
         ["defensive_actions.interceptions", 90, false],
         ["defensive_actions.tackles_interceptions", 80, false],
-        ["defensive_actions.errors", 100, false],
+        ["defensive_actions.errors", 100, true],
         ["misc.pens_conceded", 60, false],
         ["misc.aerials_won", 140, false],
         ["misc.aerials_won_pct", 140, false]
