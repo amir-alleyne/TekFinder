@@ -36,6 +36,7 @@ def GetProfilePlayers():
     verbose = None
     try:
         verbose = data['verbose']
+        del data['verbose']
     # Catch the KeyError in case the use forgot to mention verbose = True or False
     except KeyError:
         pass
