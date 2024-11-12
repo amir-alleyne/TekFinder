@@ -61,7 +61,7 @@ class TestProfiles:
 
     def test_correct_input(self):
         """
-        This is a test where the user porvides with a CORRECT profile, regular search.
+        This is a test where the user provides with a CORRECT profile, regular search.
         """
         self.url += "/profiles"
         params = {
@@ -69,6 +69,12 @@ class TestProfiles:
         }
         response = requests.get(self.url, params=params)
         assert len(json.loads(response.text)) != 0
+
+    def test_correct_input_verbose(self):
+        """
+        THis is a test where the user provides with a CORRECT profile, regular search and added request for verbose.
+        """
+        pass
 
 
     ############################################# Custom Get Player Profile #############################################
