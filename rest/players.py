@@ -41,9 +41,10 @@ def GetProfilePlayers():
     except KeyError:
         pass
     
-    profile_input = {'profile': data['profile']}
+    profile_input = {'profile': data.get('profile', '')}
+
    
-    if profile_input == {}:
+    if profile_input['profile'] == '':
         return jsonify(["Error: Please enter a profile"])
     
     profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
@@ -96,9 +97,9 @@ def GetCustomProfilePlayers():
     except KeyError:
         pass
     
-    profile_input = {'profile': data['profile']}
+    profile_input = {'profile': data.get('profile', '')}
    
-    if profile_input == {}:
+    if profile_input['profile'] == '':
         return jsonify(["Error: Please enter a profile"])
     
     profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
@@ -147,8 +148,8 @@ def GetCustomProfilePlayers():
 @players_end.route('/profiles/weights', methods=['GET'])
 def GetProfileWeights():
     data = request.args.to_dict()
-    profile_input = {'profile': data['profile']}
-    if profile_input == {}:
+    profile_input = {'profile': data.get('profile', '')}
+    if profile_input['profile'] == '':
         return jsonify(["Error: Please enter a profile"])
     
     profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []

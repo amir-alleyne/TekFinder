@@ -2,6 +2,7 @@ import requests
 import pytest
 import time
 import subprocess
+import json
 
 """
 This is a class responsible for testing the profiles endpoint of the API.
@@ -40,13 +41,35 @@ class TestProfiles:
         """
         This is a test where the user has provided an incorrect input.
         """
-        pass
+        self.url += "/profiles"
+        params = {
+            "profile": None
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == ["Error: Please enter a profile"]
 
     def test_incorrect_profile_input(self):
         """
-        This is a test where the user has provided with an appropriate input but WRONG profile.
+        This is a test whee the user has provided with an appropriate input but WRONG profile.
         """
-        pass
+        self.url += "/profiles"
+        params = {
+            "profile": "TEST_ERROR"
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == ["Error: Please enter a correct profile"]
+
+    def test_correct_input(self):
+        """
+        This is a test where the user porvides with a CORRECT profile, regular search.
+        """
+        self.url += "/profiles"
+        params = {
+            "profile": "Playmaker"
+        }
+        response = requests.get(self.url, params=params)
+        assert len(json.loads(response.text)) != 0
+
 
     ############################################# Custom Get Player Profile #############################################
 
