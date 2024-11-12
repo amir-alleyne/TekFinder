@@ -11,6 +11,9 @@ class TestProfiles:
     
     @classmethod
     def setup_class(cls):
+        """
+        This is the setup method for this testing class, it is responsible for booting up a test server to run tests on.
+        """
         # Start the API necessary for the testing by running main.py
         cls.api_process = subprocess.Popen(['python', 'main.py'])
 
@@ -19,12 +22,37 @@ class TestProfiles:
 
     @classmethod
     def teardown_class(cls):
+        """
+        This is the teardown method which terminates the process on which the test server was run on after finishing all tests.
+        """
         # Terminate the API process after tests are done
         cls.api_process.terminate()
 
     def test_api_endpoint(self):
+        """
+        This is a simple test aimed to confirm if the server is up.
+        """
         response = requests.get(self.url)
         assert response.status_code == 200
+
+    ############################################# Regular Get Player Profiles #############################################
+    def test_incorrect_input(self):
+        """
+        This is a test where the user has provided an incorrect input.
+        """
+        pass
+
+    def test_incorrect_profile_input(self):
+        """
+        This is a test where the user has provided with an appropriate input but WRONG profile.
+        """
+        pass
+
+    ############################################# Custom Get Player Profile #############################################
+
+
+    #################################################### Get Weights ####################################################
+
 
 
 
