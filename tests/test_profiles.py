@@ -8,7 +8,7 @@ import json
 This is a class responsible for testing the profiles endpoint of the API.
 """
 class TestProfiles:
-    url = "http://127.0.0.1:9999/players"
+    url = "http://127.0.0.1:4000/players"
     
     @classmethod
     def setup_class(cls):
