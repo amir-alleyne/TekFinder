@@ -9,7 +9,7 @@ app.register_blueprint(tables, url_prefix='/tables')
 
 if __name__ == '__main__':
     print("============================Running the app============================")
-    port = int(os.getenv('PORT', 4000))
+    port = 4000 if os.environ.get('PORT') is None else os.environ.get('PORT')
     app.run(debug=True, port=port)
     print("============================App has stopped============================")
     
