@@ -16,6 +16,12 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env: # Define environment variables here
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD:  ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_HOST:  ${{ secrets.POSTGRES_HOST }}
+      POSTGRES_PORT:  ${{ secrets.POSTGRES_PORT }}
+      POSTGRES_DB:  ${{ secrets.POSTGRES_DB }}
 
     steps:
     - uses: actions/checkout@v4
@@ -34,6 +40,10 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Echo environment variable
+      run: |
+        echo "POSTGRES_PORT is set to: ${POSTGRES_PORT}*****"
+    
     - name: Start server
       run: |
         nohup python main.py &
