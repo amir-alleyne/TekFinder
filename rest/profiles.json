@@ -128,8 +128,8 @@
     "Poacher": [
         ["players.player_id", null, false],
         ["players.name", null, false],
-        ["passing.minute_90s", 1500, false],
         ["misc.season", null, false],
+        ["passing.minute_90s", 1500, false],
         ["shots.goals", 150, false],
         ["shots.xg", 120, false],
         ["shots.npxg", 100, false],
@@ -139,8 +139,7 @@
         ["shots.avg_shot_distance", 100, true],
         ["possession.touches_att_pen_area", 140, false],
         ["possession.dribbles_completed", 70, false],
-        ["possession.passes_received", 90, false],
-        ["misc.pens_won", 40, false]
+        ["possession.passes_received", 90, false]
     ],
     "Sweeper Keeper": [
         ["players.player_id", null, false],

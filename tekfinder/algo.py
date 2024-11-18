@@ -26,7 +26,7 @@ def recommend_players(target_profile, player_data, k, real_player_data):
 
     # Find the k nearest neighbors to the target profile
     distances, indices = knn.kneighbors([target_profile])
-    print("Distances: ", distances)
+    # print("Distances: ", distances)
     d_min = np.min(distances)
     d_max = np.max(distances)
 
@@ -34,7 +34,7 @@ def recommend_players(target_profile, player_data, k, real_player_data):
     # The reason why I am using 1 as the min distance is because nodes usually should not have a distance closer than 1 unless they are the node themselves
     ratings = 100 * (1 - (distances - 1) / (d_max - 1))
 
-    print(f"Ratings: {ratings}")
+    # print(f"Ratings: {ratings}")
 
     # Retrieve the recommended player profiles
     recommended_players = real_player_data[indices[0]]

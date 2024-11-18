@@ -25,7 +25,6 @@ def GetPlayers():
     if not results:
         return jsonify({"error": "No players found"})
     results = [result.__dict__ for result in results]
-    
     for result in results:
         result.pop('_sa_instance_state')
     return jsonify([json.loads(json.dumps(result, ensure_ascii=False)) for result in results])
@@ -33,11 +32,21 @@ def GetPlayers():
 @players_end.route('/profiles', methods=['GET'])
 def GetProfilePlayers():
     data = request.args.to_dict()
+    if data == {}:
+        return jsonify(["Error: Please enter a profile"])
+    
     verbose = None
     try:
         verbose = data['verbose']
         del data['verbose']
     # Catch the KeyError in case the use forgot to mention verbose = True or False
+    except KeyError:
+        pass
+    season = None
+    try:
+        season = data['season']
+        del data['season']
+ 
     except KeyError:
         pass
     
@@ -52,7 +61,6 @@ def GetProfilePlayers():
         return jsonify(["Error: Please enter a correct profile"])
 
     del data['profile']
-   
     json_search_results = db.json_search(Players, json.dumps(data))
     if not json_search_results:
         return jsonify({"error": "No players found"})
@@ -61,18 +69,15 @@ def GetProfilePlayers():
         result.__dict__.pop('_sa_instance_state')
     json_search_player_ids = [result.player_id for result in json_search_results]
 
-
     profile_attributes_list = get_profile_attribute_list(profile)
-    stats = get_player_stats(profile_attributes_list, db, player_ids=json_search_player_ids)
+    stats = get_player_stats(profile_attributes_list, db, player_ids=json_search_player_ids, season=season)
 
     if len(stats) == 0:
         return jsonify({"error": "No players found"})
     
     profile_weights = get_profile_weights(profile)
-    print(profile)
     normalized_player_data, player_data = preprocess(stats, profile_weights, profile)
     n = len(profile_weights)
-    # print(normalized_player_data)
     target = np.ones(n)
     result = recommend_players(target, normalized_player_data, 20, player_data)
 
@@ -91,9 +96,20 @@ def GetProfilePlayers():
 def GetCustomProfilePlayers():
     data = request.args.to_dict()
     verbose = None
+    if data == {}:
+        return jsonify(["Error: Please enter a profile"])
+    
     try:
         verbose = data['verbose']
     # Catch the KeyError in case the use forgot to mention verbose = True or False
+    except KeyError:
+        pass
+    
+    season = None
+    try:
+        season = data['season']
+        del data['season']
+ 
     except KeyError:
         pass
     
@@ -118,7 +134,7 @@ def GetCustomProfilePlayers():
 
 
     profile_attributes_list = get_profile_attribute_list(profile)
-    stats = get_player_stats(profile_attributes_list, db, player_ids=json_search_player_ids)
+    stats = get_player_stats(profile_attributes_list, db, player_ids=json_search_player_ids, season=season)
     if len(stats) == 0:
         return jsonify({"error": "No players found"})
     
