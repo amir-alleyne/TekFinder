@@ -138,11 +138,44 @@ class TestProfiles:
 
     #################################################### Get Weights ####################################################
 
+    def test_incorrect_weights_endpoint(self):
+        """
+        This is a test where we test the incorrect input for the weights endpoint.
+        """
+        self.url += "/profiles/weights"
+        params = {
+            "profile": None
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == ["Error: Please enter a profile"]
+
+    def test_incorrect_weights_profile_endpoint(self):
+        """
+        This is a test where we test the incorrect profile input for the weights endpoint. 
+        """
+        self.url += "/profiles/weights"
+        params = {
+            "profile": "TEST_ERROR"
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == ["Error: Please enter a correct profile"]
+
+    def test_correct_weights_endpoint(self):
+        """
+        This is a test where we test the CORRECT profile input for the weights endpoint.
+        """
+        self.url += "/profiles/weights"
+        params = {
+            "profile": "Playmaker"
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
+        
 
 
 
 if __name__ == "__main__":
 
     test = TestProfiles()
-    print(test.test_incorrect_input_custom())
+    print(test.test_correct_weights_endpoint())
 
