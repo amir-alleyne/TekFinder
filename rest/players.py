@@ -7,6 +7,8 @@ from profiles.profiles import get_player_stats, get_profile_attribute_list, get_
 from tekfinder.algo import preprocess, recommend_players
 from collections import OrderedDict
 
+from utils import getPlayerData
+
 players_end = Blueprint('players', __name__)
 
 with open('rest/profiles.json', 'r') as json_file:
@@ -121,10 +123,12 @@ def GetCustomProfilePlayers():
     profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
     if profile == []:
         return jsonify(["Error: Please enter a correct profile"])
-
     del data['profile']
+
+    player_data = getPlayerData(data)   
+    print(player_data)
    
-    json_search_results = db.json_search(Players, json.dumps({}))
+    json_search_results = db.json_search(Players, json.dumps(player_data))
     if not json_search_results:
         return jsonify({"error": "No players found"})
 
