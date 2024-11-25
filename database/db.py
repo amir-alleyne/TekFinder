@@ -90,9 +90,3 @@ class Database:
         '''
         self.cursor.close()
         self.connection.close()
-
-
-if __name__ == "__main__":
-
-    db = Database()
-    # You want to make a teardown method to close the connection after the class instance is over

@@ -69,37 +69,3 @@ def preprocess(player_data: np.array, weights, attributes=None):
      
 
     return normalized_player_data, player_data
-
-
-if __name__ == '__main__':
-    
-    load_dotenv()
-    print("============================Connecting to the database=============================")
-    db = psycopg2.connect(
-            f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}",
-            cursor_factory=RealDictCursor
-        )
-    query = "SELECT p.name, s.season, goals,shots_total,shots_on_target,shots_on_target_pct,shots_total_per90,shots_on_target_per90,goals_per_shot,goals_per_shot_on_target,avg_shot_distance,shots_free_kicks,pens_made,pens_att,xg,npxg,xg_per_shot,goals_minus_xg,npg_minus_npxg FROM shots s join players p on p.player_id = s.player_id" #order by goals desc
-    cur = db.cursor()
-    cur.execute(query)
-    player_data = cur.fetchall()
-    np.set_printoptions(suppress=True)
-    weights = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
-    normalized_player_data, player_data = preprocess(player_data, weights)
-    
-    # Number of nearest neighbors to recommend
-    k = 5
-    target_profile = np.ones(len(normalized_player_data[0]))
-    # # Recommend k nearest player profiles
-    recommended_players = recommend_players(target_profile, normalized_player_data, k, player_data)
-    # ind = recommend_players_weighted(target_profile, normalized_player_data, weights)
-    # print(player_data[ind])
-    # print the players with the corresponding features like goals: 0, shots_total: 1, shots_on_target: 2, shots_on_target_pct: 3, shots_total_per90: 4, shots_on_target_per90: 5, goals_per_shot: 6, goals_per_shot_on_target: 7, avg_shot_distance: 8, shots_free_kicks: 9, pens_made: 10, pens_att: 11, xg: 12, npxg: 13, xg_per_shot: 14, goals_minus_xg: 15, npg_minus_npxg: 16
-    aligned_features = ["name", "season", "goals", "shots_total", "shots_on_target", "shots_on_target_pct", "shots_total_per90", "shots_on_target_per90", "goals_per_shot", "goals_per_shot_on_target", "avg_shot_distance", "shots_free_kicks", "pens_made", "pens_att", "xg", "npxg", "xg_per_shot", "goals_minus_xg", "npg_minus_npxg"]
-    for i in range(len(recommended_players)):
-        print(f"Player {i+1}:")
-        for j in range(len(recommended_players[i])):
-            print(f"{aligned_features[j]}: {recommended_players[i][j]}")
-        print("\n")
-
-    # print("Recommended: " , recommended_players)

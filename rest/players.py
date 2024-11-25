@@ -5,9 +5,9 @@ from database.tables.players import Players
 from app import db
 from profiles.profiles import get_player_stats, get_profile_attribute_list, get_profile_weights
 from tekfinder.algo import preprocess, recommend_players
-from collections import OrderedDict
 
 from utils import getPlayerData
+from utils.utils import checkSeason, checkVerbose, mutate_json_search_results
 
 players_end = Blueprint('players', __name__)
 
@@ -33,54 +33,42 @@ def GetPlayers():
 
 @players_end.route('/profiles', methods=['GET'])
 def GetProfilePlayers():
+    """
+    Takes in a player profile and returns the top 20 players that match the profile
+    """
     data = request.args.to_dict()
     if data == {}:
         return jsonify(["Error: Please enter a profile"])
     
-    verbose = None
-    try:
-        verbose = data['verbose']
-        del data['verbose']
-    # Catch the KeyError in case the use forgot to mention verbose = True or False
-    except KeyError:
-        pass
-    season = None
-    try:
-        season = data['season']
-        del data['season']
- 
-    except KeyError:
-        pass
+    verbose = checkVerbose(data)
+    season = checkSeason(data)
     
     profile_input = {'profile': data.get('profile', '')}
-
-   
     if profile_input['profile'] == '':
         return jsonify(["Error: Please enter a profile"])
     
     profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
     if profile == []:
         return jsonify(["Error: Please enter a correct profile"])
-
     del data['profile']
+
     json_search_results = db.json_search(Players, json.dumps(data))
     if not json_search_results:
         return jsonify({"error": "No players found"})
     
-    for result in json_search_results:
-        result.__dict__.pop('_sa_instance_state')
+    json_search_results = mutate_json_search_results(json_search_results)
     json_search_player_ids = [result.player_id for result in json_search_results]
 
     profile_attributes_list = get_profile_attribute_list(profile)
-    stats = get_player_stats(profile_attributes_list, db, player_ids=json_search_player_ids, season=season)
 
+    stats = get_player_stats(profile_attributes_list, db, player_ids=json_search_player_ids, season=season)
     if len(stats) == 0:
         return jsonify({"error": "No players found"})
     
     profile_weights = get_profile_weights(profile)
     normalized_player_data, player_data = preprocess(stats, profile_weights, profile)
-    n = len(profile_weights)
-    target = np.ones(n)
+    target = np.ones(len(profile_weights))
+
     result = recommend_players(target, normalized_player_data, 20, player_data)
 
     profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:]
@@ -96,27 +84,17 @@ def GetProfilePlayers():
 
 @players_end.route('/profiles/custom', methods=['GET'])
 def GetCustomProfilePlayers():
+    """
+    Takes in json input from the payload and uses the json search function to query the database. It can be used to search for custom weights per profile
+    """
     data = request.args.to_dict()
-    verbose = None
     if data == {}:
         return jsonify(["Error: Please enter a profile"])
-    
-    try:
-        verbose = data['verbose']
-    # Catch the KeyError in case the use forgot to mention verbose = True or False
-    except KeyError:
-        pass
-    
-    season = None
-    try:
-        season = data['season']
-        del data['season']
- 
-    except KeyError:
-        pass
+        
+    verbose = checkVerbose(data)
+    season = checkSeason(data)
     
     profile_input = {'profile': data.get('profile', '')}
-   
     if profile_input['profile'] == '':
         return jsonify(["Error: Please enter a profile"])
     
@@ -126,14 +104,12 @@ def GetCustomProfilePlayers():
     del data['profile']
 
     player_data = getPlayerData(data)   
-    print(player_data)
    
     json_search_results = db.json_search(Players, json.dumps(player_data))
     if not json_search_results:
         return jsonify({"error": "No players found"})
 
-    for result in json_search_results:
-        result.__dict__.pop('_sa_instance_state')
+    json_search_results = mutate_json_search_results(json_search_results)
     json_search_player_ids = [result.player_id for result in json_search_results]
 
 
@@ -149,12 +125,11 @@ def GetCustomProfilePlayers():
     profile_weights = np.array([x[1] for x in profile_weights[3:]])
   
     normalized_player_data, player_data = preprocess(stats, profile_weights, profile[3:])
-    n = len(profile_weights)
-    target = np.ones(n)
+    target = np.ones(len(profile_weights))
+
     result = recommend_players(target, normalized_player_data, 20, player_data)
 
     profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:]
-
     if verbose:
         final_list = []
         for player in result:

@@ -1,7 +1,5 @@
 from dotenv import load_dotenv
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-import os
 
 from database.alchemydb import Database
 db = Database()
