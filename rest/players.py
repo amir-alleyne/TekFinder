@@ -7,12 +7,9 @@ from profiles.profiles import get_player_stats, get_profile_attribute_list, get_
 from tekfinder.algo import preprocess, recommend_players
 
 from utils import getPlayerData
-from utils.utils import checkSeason, checkVerbose, mutate_json_search_results
+from utils.utils import checkSeason, checkVerbose, clean_data, fetch_profile, mutate_json_search_results
 
 players_end = Blueprint('players', __name__)
-
-with open('rest/profiles.json', 'r') as json_file:
-    player_profiles = json.load(json_file)
 
 
 # GET request to retrieve players with specific attributes
@@ -37,20 +34,9 @@ def GetProfilePlayers():
     Takes in a player profile and returns the top 20 players that match the profile
     """
     data = request.args.to_dict()
-    if data == {}:
-        return jsonify(["Error: Please enter a profile"])
-    
-    verbose = checkVerbose(data)
-    season = checkSeason(data)
-    
-    profile_input = {'profile': data.get('profile', '')}
-    if profile_input['profile'] == '':
-        return jsonify(["Error: Please enter a profile"])
-    
-    profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
-    if profile == []:
-        return jsonify(["Error: Please enter a correct profile"])
-    del data['profile']
+    data, profile, verbose, season, error = clean_data(data)
+    if error:
+        return error
 
     json_search_results = db.json_search(Players, json.dumps(data))
     if not json_search_results:
@@ -88,21 +74,10 @@ def GetCustomProfilePlayers():
     Takes in json input from the payload and uses the json search function to query the database. It can be used to search for custom weights per profile
     """
     data = request.args.to_dict()
-    if data == {}:
-        return jsonify(["Error: Please enter a profile"])
-        
-    verbose = checkVerbose(data)
-    season = checkSeason(data)
-    
-    profile_input = {'profile': data.get('profile', '')}
-    if profile_input['profile'] == '':
-        return jsonify(["Error: Please enter a profile"])
-    
-    profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
-    if profile == []:
-        return jsonify(["Error: Please enter a correct profile"])
-    del data['profile']
-
+    data, profile, verbose, season, error = clean_data(data)
+    if error:
+        return error
+   
     player_data = getPlayerData(data)   
    
     json_search_results = db.json_search(Players, json.dumps(player_data))
@@ -147,7 +122,7 @@ def GetProfileWeights():
     if profile_input['profile'] == '':
         return jsonify(["Error: Please enter a profile"])
     
-    profile = player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
+    profile = fetch_profile(profile_input)
     if profile == []:
         return jsonify(["Error: Please enter a correct profile"])
     

@@ -1,5 +1,11 @@
 
+import json
+from flask import jsonify
+
+
 PLAYER_ATTRS = ['name', 'age', 'pos', 'nationality', 'club_id']  # Example attributes
+with open('rest/profiles.json', 'r') as json_file:
+    player_profiles = json.load(json_file)
 
 
 def getPlayerData(data):
@@ -60,3 +66,28 @@ def mutate_json_search_results(json_search_results):
     for result in json_search_results:
         result.__dict__.pop('_sa_instance_state')
     return json_search_results
+
+def clean_data(data):
+    """
+    Cleans the data by checking if data is empty, if the profile is present and if the profile is correct
+
+    """
+    if data == {}:
+        return {},[], None, None, jsonify(["Error: Please enter a profile"])
+    
+    verbose = checkVerbose(data)
+    season = checkSeason(data)
+    
+    profile_input = {'profile': data.get('profile', '')}
+    if profile_input['profile'] == '':
+        return {},[], None, None, jsonify(["Error: Please enter a profile"])
+    
+    profile = fetch_profile(profile_input)
+    if profile == []:
+        return {},[], None, None, jsonify(["Error: Please enter a correct profile"])
+    del data['profile']
+
+    return data, profile, verbose, season, None
+
+def fetch_profile(profile_input):
+    return player_profiles[profile_input['profile']] if profile_input['profile'] in player_profiles else []
