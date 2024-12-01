@@ -72,27 +72,110 @@ class TestProfiles:
 
     def test_correct_input_verbose(self):
         """
-        THis is a test where the user provides with a CORRECT profile, regular search and added request for verbose.
+        This is a test where the user provides with a CORRECT profile, regular search and added request for verbose.
         """
-        pass
+        self.url += "/profiles"
+        params = {
+            "profile": "Playmaker",
+            "verbose": True
+        }
+        response = requests.get(self.url, params=params)
+        assert len(json.loads(response.text)[0]) > 2
 
 
     ############################################# Custom Get Player Profile #############################################
 
+    def test_incorrect_input_custom(self):
+        """
+        This is a test where the user has provided an incorrect input for the custom profile endpoint.
+        """
+        self.url += "/profiles/custom"
+        params = {
+            "profile": None,
+            "season": "2021"
+        }
+        response = requests.get(self.url, params=params)
+        print(response.text)
+        assert json.loads(response.text) == ["Error: Please enter a profile"]
+
+    def test_incorrect_profile_input_custom(self):
+        """
+        This is a test where the user had provided an incorrect profile input for the custom profile endpoint.
+        """
+        self.url += "/profiles/custom"
+        params = {
+            "profile": "TEST_ERROR",
+            "pos": "MF"
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == ["Error: Please enter a correct profile"]
+
+    def test_correct_input_custom(self):
+        """
+        This is a test where the user has provided a CORRECT input for the custom profile endpoint.
+        """
+        self.url += "/profiles/custom"
+        params = {
+            "profile": "Ball Playing Centreback",
+            "season": "2021"
+        }
+        response = requests.get(self.url, params=params)
+        print(response.text)
+        assert len(json.loads(response.text)) != 0
+
+    def test_correct_input_verbose(self):
+        """
+        This is a test where the user provides with a CORRECT profile, custom search and added request for verbose.
+        """
+        self.url += "/profiles/custom"
+        params = {
+            "profile": "Playmaker",
+            "pos": "DF",
+            "verbose": True
+        }
+        response = requests.get(self.url, params=params)
+        assert len(json.loads(response.text)[0]) > 2
 
     #################################################### Get Weights ####################################################
 
+    def test_incorrect_weights_endpoint(self):
+        """
+        This is a test where we test the incorrect input for the weights endpoint.
+        """
+        self.url += "/profiles/weights"
+        params = {
+            "profile": None
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == ["Error: Please enter a profile"]
+
+    def test_incorrect_weights_profile_endpoint(self):
+        """
+        This is a test where we test the incorrect profile input for the weights endpoint. 
+        """
+        self.url += "/profiles/weights"
+        params = {
+            "profile": "TEST_ERROR"
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == ["Error: Please enter a correct profile"]
+
+    def test_correct_weights_endpoint(self):
+        """
+        This is a test where we test the CORRECT profile input for the weights endpoint.
+        """
+        self.url += "/profiles/weights"
+        params = {
+            "profile": "Playmaker"
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
+        
 
 
 
 if __name__ == "__main__":
 
-    url = "http://127.0.0.1:5000/players/profiles"
-
-    args = {"profile": "Target Man", "verbose": True}
-
-    request = requests.get(url=url, params=args)
-
-    print(request.status_code)
-    print(request.text)
+    test = TestProfiles()
+    print(test.test_correct_weights_endpoint())
 
