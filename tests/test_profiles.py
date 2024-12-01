@@ -77,7 +77,7 @@ class TestProfiles:
         self.url += "/profiles"
         params = {
             "profile": "Playmaker",
-            "verbose": True
+            "verbose": "True"
         }
         response = requests.get(self.url, params=params)
         assert len(json.loads(response.text)[0]) > 2
@@ -105,7 +105,7 @@ class TestProfiles:
         self.url += "/profiles/custom"
         params = {
             "profile": "TEST_ERROR",
-            "pos": "MF"
+            "pos": "{DF}"
         }
         response = requests.get(self.url, params=params)
         assert json.loads(response.text) == ["Error: Please enter a correct profile"]
@@ -123,15 +123,15 @@ class TestProfiles:
         print(response.text)
         assert len(json.loads(response.text)) != 0
 
-    def test_correct_input_verbose(self):
+    def test_correct_input_verbose_custom(self):
         """
         This is a test where the user provides with a CORRECT profile, custom search and added request for verbose.
         """
         self.url += "/profiles/custom"
         params = {
             "profile": "Playmaker",
-            "pos": "DF",
-            "verbose": True
+            "pos": "{DF}",
+            "verbose": "True"
         }
         response = requests.get(self.url, params=params)
         assert len(json.loads(response.text)[0]) > 2
@@ -177,5 +177,5 @@ class TestProfiles:
 if __name__ == "__main__":
 
     test = TestProfiles()
-    print(test.test_correct_weights_endpoint())
+    print(test.test_correct_input_verbose())
 

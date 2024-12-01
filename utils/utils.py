@@ -86,6 +86,11 @@ def clean_data(data):
     if profile == []:
         return {},[], None, None, jsonify(["Error: Please enter a correct profile"])
     del data['profile']
+    
+    try:
+        del data['verbose']
+    except KeyError:
+        pass
 
     return data, profile, verbose, season, None
 
