@@ -77,7 +77,7 @@ class TestProfiles:
         self.url += "/profiles"
         params = {
             "profile": "Playmaker",
-            "verbose": "True"
+            "verbose": "1"
         }
         response = requests.get(self.url, params=params)
         assert len(json.loads(response.text)[0]) > 2
@@ -131,7 +131,7 @@ class TestProfiles:
         params = {
             "profile": "Playmaker",
             "pos": "{DF}",
-            "verbose": "True"
+            "verbose": "1"
         }
         response = requests.get(self.url, params=params)
         assert len(json.loads(response.text)[0]) > 2

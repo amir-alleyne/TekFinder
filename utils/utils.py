@@ -26,7 +26,7 @@ def getPlayerData(data: dict) -> dict:
     return player_data
 
 
-def checkVerbose(data: dict) -> bool:
+def checkVerbose(data: dict) -> int:
     """
     Checks if the verbose key is present in the json input
 
@@ -36,11 +36,11 @@ def checkVerbose(data: dict) -> bool:
     verbose = None
     
     try:
-        verbose = data['verbose']
+        verbose = int(data['verbose'])
     # Catch the KeyError in case the use forgot to mention verbose = True or False
     except KeyError:
         pass
-    return bool(verbose)
+    return verbose
 
 def checkSeason(data: dict) -> str:
     """
