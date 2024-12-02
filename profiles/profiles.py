@@ -2,13 +2,11 @@ import numpy as np
 import sys
 import os
 
-from sqlalchemy import and_
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from database.tables.players import Players
 from database.tables.shots import Shots
 from database.tables.possession import Possession
 
-from tekfinder.algo import preprocess, recommend_players
 from database.tables.misc import Misc
 from database.tables.defensive_actions import DefensiveActions
 from database.tables.passing import Passing
@@ -30,11 +28,10 @@ def get_profile_weights(profile: list, verbose=False) -> np.array:
 
 def get_profile_attribute_list(profile: list) -> list:
     """Input the player_profile list of tuples and get the attributes list. """
-
     return [x[0] for x in profile]
 
 
-def get_player_stats(input_list, db, season=None, player_ids=None):
+def get_player_stats(input_list: list, db, season=None, player_ids=None) -> np.array:
     """
     This function is responsible for fetching the stats of players given a database db and an input list of wanted stats.
     Also you can input a string representing a season if wanted
@@ -72,10 +69,14 @@ def get_player_stats(input_list, db, season=None, player_ids=None):
                 continue
             else:
                 if season:
-                    query = query.join(table, (Players.player_id == table.player_id) & (Misc.season == table.season) & (Misc.club_id == table.club_id) & (table.season == season))
+                    query = query.join(table, (Players.player_id == table.player_id) &
+                                       (Misc.season == table.season) & (Misc.club_id == table.club_id) &
+                                       (table.season == season))
                 else:
                     # Join the tables together with each iteration
-                    query = query.join(table, (Players.player_id == table.player_id) & (Misc.season == table.season) & (Misc.club_id == table.club_id))
+                    query = query.join(table, (Players.player_id == table.player_id) &
+                                       (Misc.season == table.season) &
+                                       (Misc.club_id == table.club_id))
 
             joined_tables.add(table_name)
 
@@ -88,12 +89,10 @@ def get_player_stats(input_list, db, season=None, player_ids=None):
     query = query.with_entities(*selected_columns)
 
     # Iterate over the list and print the column names
-    column_names = [col.key for col in selected_columns]
     if player_ids:
         query = query.filter(Players.player_id.in_(player_ids))
     # Execute the query
     results = query.all()
-    results_dict = [dict(zip(column_names, row)) for row in results]
 
     # Convert the results to a numpy array
     # Replace None with 0 in the results

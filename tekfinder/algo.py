@@ -1,11 +1,8 @@
-from dotenv import load_dotenv
 import numpy as np
-import psycopg2
-from psycopg2.extras import RealDictCursor
 from sklearn.neighbors import NearestNeighbors
-import os
+from typing import Tuple
 
-def recommend_players(target_profile, player_data, k, real_player_data):
+def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, k: int, real_player_data: np.ndarray) -> np.ndarray:
     """Recommends k nearest player profiles based on a target profile.
 
     Args:
@@ -34,14 +31,12 @@ def recommend_players(target_profile, player_data, k, real_player_data):
     # The reason why I am using 1 as the min distance is because nodes usually should not have a distance closer than 1 unless they are the node themselves
     ratings = 100 * (1 - (distances - 1) / (d_max - 1))
 
-    # print(f"Ratings: {ratings}")
-
     # Retrieve the recommended player profiles
     recommended_players = real_player_data[indices[0]]
 
     return recommended_players
 
-def preprocess(player_data: np.array, weights, attributes=None):
+def preprocess(player_data: np.ndarray, weights: np.ndarray, attributes:list=None) -> Tuple[np.ndarray, np.ndarray]:
     """Preprocesses the player data by normalizing the features.
 
     Args:
