@@ -1,8 +1,10 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from typing import Tuple
+import math
 
-def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, k: int, real_player_data: np.ndarray) -> np.ndarray:
+def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, 
+                      k: int, real_player_data: np.ndarray) -> np.ndarray:
     """Recommends k nearest player profiles based on a target profile.
 
     Args:
@@ -23,18 +25,48 @@ def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, k: in
 
     # Find the k nearest neighbors to the target profile
     distances, indices = knn.kneighbors([target_profile])
-    # print("Distances: ", distances)
-    d_min = np.min(distances)
-    d_max = np.max(distances)
 
-    # Normalize to a rating between 0 and 100
-    # The reason why I am using 1 as the min distance is because nodes usually should not have a distance closer than 1 unless they are the node themselves
-    ratings = 100 * (1 - (distances - 1) / (d_max - 1))
+    def get_tek_score(distances: np.ndarray, threshold: float = None) -> np.ndarray:
+        """
+        Scales distances to a 0-100 score range with a defined threshold.
+        
+        Args:
+            distances: A NumPy array of distances.
+            threshold: An upper threshold for the scaling (optional).
+        
+        Returns:
+            A NumPy array of scores in the range 0-100.
+        """
+        # Find the minimum distance
+        min_distance = np.min(distances)
+        
+        # Set a threshold if not provided (e.g., 90th percentile)
+        if threshold is None:
+            threshold = np.percentile(distances, 90)
+        
+        # Cap distances at the threshold
+        capped_distances = np.minimum(distances, threshold)
+        
+        # Scale distances to a 0-100 range
+        scores = 100 * (1 - (capped_distances - min_distance) / (threshold - min_distance))
+        
+        # Ensure scores are clipped within the range [0, 100]
+        scores = np.clip(scores, 0, 100)
+        
+        return scores
 
     # Retrieve the recommended player profiles
-    recommended_players = real_player_data[indices[0]]
+    recommended_players = real_player_data[indices[0]].tolist()
 
-    return recommended_players
+    scores = get_tek_score(distances=distances).tolist()[0]
+
+    print(len(recommended_players), len(scores))
+
+    for i in range(len(recommended_players)):
+        recommended_players[i].append(math.ceil(scores[i]))
+
+    return np.array(recommended_players)
+
 
 def preprocess(player_data: np.ndarray, weights: np.ndarray, attributes:list=None) -> Tuple[np.ndarray, np.ndarray]:
     """Preprocesses the player data by normalizing the features.
