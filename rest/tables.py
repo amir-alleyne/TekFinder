@@ -1,4 +1,3 @@
-import math
 from flask import Blueprint, jsonify
 from sqlalchemy import text
 from app import db
@@ -8,7 +7,6 @@ import pandas as pd
 def read_data(filename):
     data = pd.read_csv(filename)
     return data
-
 
 
 tables = Blueprint('tables', __name__)

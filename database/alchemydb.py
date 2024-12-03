@@ -10,7 +10,7 @@ from database.tables.base import Base
 
 # Database class to manage connections and sessions
 class Database:
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the database connection and session using environment variables."""
         load_dotenv()
 

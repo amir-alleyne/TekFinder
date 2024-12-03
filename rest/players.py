@@ -7,7 +7,7 @@ from profiles.profiles import get_player_stats, get_profile_attribute_list, get_
 from tekfinder.algo import preprocess, recommend_players
 
 from utils import getPlayerData
-from utils.utils import checkSeason, checkVerbose, clean_data, fetch_profile, mutate_json_search_results
+from utils.utils import clean_data, fetch_profile, mutate_json_search_results
 
 players_end = Blueprint('players', __name__)
 
