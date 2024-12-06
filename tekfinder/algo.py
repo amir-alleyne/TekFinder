@@ -39,7 +39,6 @@ def recommend_players(target_profile: np.ndarray, player_data: np.ndarray,
 
     scores = get_tek_score(distances=distances).tolist()[0]
 
-    print(len(recommended_players), len(scores))
 
     for i in range(len(recommended_players)):
         recommended_players[i].append(math.ceil(scores[i]))
