@@ -26,33 +26,12 @@ def recommend_players(target_profile: np.ndarray, player_data: np.ndarray,
     # Find the k nearest neighbors to the target profile
     distances, indices = knn.kneighbors([target_profile])
 
-    def get_tek_score(distances: np.ndarray, threshold: float = None) -> np.ndarray:
-        """
-        Scales distances to a 0-100 score range with a defined threshold.
-        
-        Args:
-            distances: A NumPy array of distances.
-            threshold: An upper threshold for the scaling (optional).
-        
-        Returns:
-            A NumPy array of scores in the range 0-100.
-        """
-        # Find the minimum distance
+    def get_tek_score(distances: np.ndarray, alpha: float = 0.85) -> np.ndarray:
         min_distance = np.min(distances)
-        
-        # Set a threshold if not provided (e.g., 90th percentile)
-        if threshold is None:
-            threshold = np.percentile(distances, 90)
-        
-        # Cap distances at the threshold
-        capped_distances = np.minimum(distances, threshold)
-        
-        # Scale distances to a 0-100 range
-        scores = 100 * (1 - (capped_distances - min_distance) / (threshold - min_distance))
-        
-        # Ensure scores are clipped within the range [0, 100]
-        scores = np.clip(scores, 0, 100)
-        
+
+        # Apply exponential scaling
+        scores = 95 * np.exp(-alpha * (distances - min_distance))
+
         return scores
 
     # Retrieve the recommended player profiles
