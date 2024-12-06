@@ -220,3 +220,37 @@ class TestProfiles:
 
 
 
+ #################################################### Get Leagues ####################################################
+    def test_incorrect_clubs_endpoint_with_id(self):
+        """
+        This is a test where we test the INCORRECT league retrieval with an id that does not exist.
+        """
+        self.url += "/leagues"
+        params = {
+            "league_id": "40"
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == {"Error": "No Leagues Found"}
+
+    
+    def test_correct_clubs_endpoint_with_league_id(self):
+        """
+        This is a test where we test the CORRECT leagues retrieval specifying a league_id.
+        """
+        self.url += "/leagues"
+        params = {
+            "league_id": "5"
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
+
+    def test_correct_clubs_endpoint(self):
+        """
+        This is a test where we test the CORRECT league retrieval for all leagues.
+        """
+        self.url += "/leagues"
+        params = {
+          
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
