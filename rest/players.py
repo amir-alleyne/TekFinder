@@ -54,8 +54,8 @@ def GetProfilePlayers():
     profile_weights = get_profile_weights(profile)
     normalized_player_data, player_data = preprocess(stats, profile_weights, profile)
     target = np.ones(len(profile_weights))
-
-    result = recommend_players(target, normalized_player_data, 20, player_data)
+    size = min(20, len(normalized_player_data))
+    result = recommend_players(target, normalized_player_data, size, player_data)
 
     profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:]
 
@@ -101,8 +101,8 @@ def GetCustomProfilePlayers():
   
     normalized_player_data, player_data = preprocess(stats, profile_weights, profile[3:])
     target = np.ones(len(profile_weights))
-
-    result = recommend_players(target, normalized_player_data, 20, player_data)
+    size = min(20, len(normalized_player_data))
+    result = recommend_players(target, normalized_player_data, size, player_data)
 
     profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:]
     if verbose:
