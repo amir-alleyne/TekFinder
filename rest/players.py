@@ -57,7 +57,8 @@ def GetProfilePlayers():
     size = min(20, len(normalized_player_data))
     result = recommend_players(target, normalized_player_data, size, player_data)
 
-    profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:]
+    profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:] + ['TekScore']
+
 
     if verbose:
         final_list = []
@@ -65,7 +66,7 @@ def GetProfilePlayers():
             final_list.append(dict(zip(profile_attributes_list, player)))
         return jsonify(json.loads(json.dumps(final_list, sort_keys=False)))
     else:
-        return jsonify([json.loads(json.dumps([res[0],res[2]], ensure_ascii=False)) for res in result])
+        return jsonify([json.loads(json.dumps([res[0],res[2],res[-1]], ensure_ascii=False)) for res in result])
 
 
 @players_end.route('/profiles/custom', methods=['GET'])
@@ -104,14 +105,14 @@ def GetCustomProfilePlayers():
     size = min(20, len(normalized_player_data))
     result = recommend_players(target, normalized_player_data, size, player_data)
 
-    profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:]
+    profile_attributes_list = ['name', 'player_id', 'season'] + profile_attributes_list[3:] + ['TekScore']
     if verbose:
         final_list = []
         for player in result:
             final_list.append(dict(zip(profile_attributes_list, player)))
         return jsonify(json.loads(json.dumps(final_list, sort_keys=False)))
     else:
-        return jsonify([json.loads(json.dumps([res[0],res[2]], ensure_ascii=False)) for res in result])
+        return jsonify([json.loads(json.dumps([res[0],res[2],res[-1]], ensure_ascii=False)) for res in result])
 
 
 

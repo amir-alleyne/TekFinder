@@ -1,8 +1,33 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from typing import Tuple
+import math
 
-def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, k: int, real_player_data: np.ndarray) -> np.ndarray:
+def _get_tek_score(distances: np.ndarray, alpha: float = 0.85) -> np.ndarray:
+        """
+        This is a private helper function to calculate a score given the distances found from KNN.
+        The technique used is Exponential scaling. It can expand smaller differences while
+        compressing larger ones. Furthermore, alpha is a constant that determines the rate of decay.
+        Larger alpha results in more steeply compressed scores.
+
+        Args:
+            distances: A NumPy array which lists the distances of the chosen player nodes
+                       based on our KNN algorithm.
+            alpha: A float value which determines the rate of decay
+
+        Returns:
+            A NumPy array of the TekScores for each shortlisted player
+        """
+        min_distance = np.min(distances)
+
+        # Apply exponential scaling
+        scores = 95 * np.exp(-alpha * (distances - min_distance))
+
+        return scores
+
+
+def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, 
+                      k: int, real_player_data: np.ndarray) -> np.ndarray:
     """Recommends k nearest player profiles based on a target profile.
 
     Args:
@@ -23,18 +48,18 @@ def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, k: in
 
     # Find the k nearest neighbors to the target profile
     distances, indices = knn.kneighbors([target_profile])
-    # print("Distances: ", distances)
-    d_min = np.min(distances)
-    d_max = np.max(distances)
-
-    # Normalize to a rating between 0 and 100
-    # The reason why I am using 1 as the min distance is because nodes usually should not have a distance closer than 1 unless they are the node themselves
-    ratings = 100 * (1 - (distances - 1) / (d_max - 1))
 
     # Retrieve the recommended player profiles
-    recommended_players = real_player_data[indices[0]]
+    recommended_players = real_player_data[indices[0]].tolist()
 
-    return recommended_players
+    scores = _get_tek_score(distances=distances).tolist()[0]
+
+
+    for i in range(len(recommended_players)):
+        recommended_players[i].append(math.ceil(scores[i]))
+
+    return np.array(recommended_players)
+
 
 def preprocess(player_data: np.ndarray, weights: np.ndarray, attributes:list=None) -> Tuple[np.ndarray, np.ndarray]:
     """Preprocesses the player data by normalizing the features.
