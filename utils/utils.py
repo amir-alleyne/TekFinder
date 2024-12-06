@@ -89,6 +89,11 @@ def clean_data(data: dict) -> Union[dict, list, bool, None]:
     del data['profile']
     
     try:
+        del data['season']
+    except KeyError:
+        pass
+
+    try:
         del data['verbose']
     except KeyError:
         pass
