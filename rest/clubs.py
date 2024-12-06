@@ -21,8 +21,8 @@ def GetClubs():
     data = request.args.to_dict()
     results = db.json_search(Clubs, json.dumps(data))
     if not results:
-        return jsonify({"error": "No clubs found"})
-    results = [result.__dict__ for result in results]
+        return jsonify({"Error": "No Clubs Found"})
+    results = [result.__dict__ for result in results] 
     for result in results:
         result.pop('_sa_instance_state')
     return jsonify([json.loads(json.dumps(result, ensure_ascii=False)) for result in results])
