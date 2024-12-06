@@ -3,6 +3,29 @@ from sklearn.neighbors import NearestNeighbors
 from typing import Tuple
 import math
 
+def _get_tek_score(distances: np.ndarray, alpha: float = 0.85) -> np.ndarray:
+        """
+        This is a private helper function to calculate a score given the distances found from KNN.
+        The technique used is Exponential scaling. It can expand smaller differences while
+        compressing larger ones. Furthermore, alpha is a constant that determines the rate of decay.
+        Larger alpha results in more steeply compressed scores.
+
+        Args:
+            distances: A NumPy array which lists the distances of the chosen player nodes
+                       based on our KNN algorithm.
+            alpha: A float value which determines the rate of decay
+
+        Returns:
+            A NumPy array of the TekScores for each shortlisted player
+        """
+        min_distance = np.min(distances)
+
+        # Apply exponential scaling
+        scores = 95 * np.exp(-alpha * (distances - min_distance))
+
+        return scores
+
+
 def recommend_players(target_profile: np.ndarray, player_data: np.ndarray, 
                       k: int, real_player_data: np.ndarray) -> np.ndarray:
     """Recommends k nearest player profiles based on a target profile.
@@ -26,18 +49,10 @@ def recommend_players(target_profile: np.ndarray, player_data: np.ndarray,
     # Find the k nearest neighbors to the target profile
     distances, indices = knn.kneighbors([target_profile])
 
-    def get_tek_score(distances: np.ndarray, alpha: float = 0.85) -> np.ndarray:
-        min_distance = np.min(distances)
-
-        # Apply exponential scaling
-        scores = 95 * np.exp(-alpha * (distances - min_distance))
-
-        return scores
-
     # Retrieve the recommended player profiles
     recommended_players = real_player_data[indices[0]].tolist()
 
-    scores = get_tek_score(distances=distances).tolist()[0]
+    scores = _get_tek_score(distances=distances).tolist()[0]
 
 
     for i in range(len(recommended_players)):
