@@ -8,7 +8,7 @@ import json
 This is a class responsible for testing the profiles endpoint of the API.
 """
 class TestProfiles:
-    url = "http://127.0.0.1:4000/players"
+    url = "http://127.0.0.1:4000"
     
     @classmethod
     def setup_class(cls):
@@ -33,6 +33,7 @@ class TestProfiles:
         """
         This is a simple test aimed to confirm if the server is up.
         """
+        self.url += "/players/profiles"
         response = requests.get(self.url)
         assert response.status_code == 200
 
@@ -41,7 +42,7 @@ class TestProfiles:
         """
         This is a test where the user has provided an incorrect input.
         """
-        self.url += "/profiles"
+        self.url += "/players/profiles"
         params = {
             "profile": None
         }
@@ -52,7 +53,7 @@ class TestProfiles:
         """
         This is a test whee the user has provided with an appropriate input but WRONG profile.
         """
-        self.url += "/profiles"
+        self.url += "/players/profiles"
         params = {
             "profile": "TEST_ERROR"
         }
@@ -63,7 +64,7 @@ class TestProfiles:
         """
         This is a test where the user provides with a CORRECT profile, regular search.
         """
-        self.url += "/profiles"
+        self.url += "/players/profiles"
         params = {
             "profile": "Playmaker"
         }
@@ -74,7 +75,7 @@ class TestProfiles:
         """
         This is a test where the user provides with a CORRECT profile, regular search and added request for verbose.
         """
-        self.url += "/profiles"
+        self.url += "/players/profiles"
         params = {
             "profile": "Playmaker",
             "verbose": "1"
@@ -89,7 +90,7 @@ class TestProfiles:
         """
         This is a test where the user has provided an incorrect input for the custom profile endpoint.
         """
-        self.url += "/profiles/custom"
+        self.url += "/players/profiles/custom"
         params = {
             "profile": None,
             "season": "2021"
@@ -102,7 +103,7 @@ class TestProfiles:
         """
         This is a test where the user had provided an incorrect profile input for the custom profile endpoint.
         """
-        self.url += "/profiles/custom"
+        self.url += "/players/profiles/custom"
         params = {
             "profile": "TEST_ERROR",
             "pos": "{DF}"
@@ -114,7 +115,7 @@ class TestProfiles:
         """
         This is a test where the user has provided a CORRECT input for the custom profile endpoint.
         """
-        self.url += "/profiles/custom"
+        self.url += "/players/profiles/custom"
         params = {
             "profile": "Ball Playing Centreback",
             "season": "2021"
@@ -127,7 +128,7 @@ class TestProfiles:
         """
         This is a test where the user provides with a CORRECT profile, custom search and added request for verbose.
         """
-        self.url += "/profiles/custom"
+        self.url += "/players/profiles/custom"
         params = {
             "profile": "Playmaker",
             "pos": "{DF}",
@@ -142,7 +143,7 @@ class TestProfiles:
         """
         This is a test where we test the incorrect input for the weights endpoint.
         """
-        self.url += "/profiles/weights"
+        self.url += "/players/profiles/weights"
         params = {
             "profile": None
         }
@@ -153,7 +154,7 @@ class TestProfiles:
         """
         This is a test where we test the incorrect profile input for the weights endpoint. 
         """
-        self.url += "/profiles/weights"
+        self.url += "/players/profiles/weights"
         params = {
             "profile": "TEST_ERROR"
         }
@@ -164,18 +165,92 @@ class TestProfiles:
         """
         This is a test where we test the CORRECT profile input for the weights endpoint.
         """
-        self.url += "/profiles/weights"
+        self.url += "/players/profiles/weights"
         params = {
             "profile": "Playmaker"
         }
         response = requests.get(self.url, params=params)
         assert len((response.text)) != 0
         
+ #################################################### Get Clubs ####################################################
+    def test_incorrect_clubs_endpoint_with_id(self):
+        """
+        This is a test where we test the INCORRECT club retrieval with an id that does not exist.
+        """
+        self.url += "/clubs"
+        params = {
+            "club_id": "5000000"
+        }
+        response = requests.get(self.url, params=params)
+        print(json.loads(response.text))
+        assert json.loads(response.text) == {"Error": "No Clubs Found"}
+
+    def test_correct_clubs_endpoint_with_id(self):
+        """
+        This is a test where we test the CORRECT club retrieval with the club_id.
+        """
+        self.url += "/clubs"
+        params = {
+            "club_id": "5"
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
+    def test_correct_clubs_endpoint_with_league_id(self):
+        """
+        This is a test where we test the CORRECT clubs retrieval specifying a league_id.
+        """
+        self.url += "/clubs"
+        params = {
+            "league_id": "5"
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
+
+    def test_correct_clubs_endpoint(self):
+        """
+        This is a test where we test the CORRECT club retrieval for all clubs.
+        """
+        self.url += "/clubs"
+        params = {
+          
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
 
 
 
-if __name__ == "__main__":
 
-    test = TestProfiles()
-    print(test.test_correct_input_verbose())
+ #################################################### Get Leagues ####################################################
+    def test_incorrect_leagues_endpoint_with_id(self):
+        """
+        This is a test where we test the INCORRECT league retrieval with an id that does not exist.
+        """
+        self.url += "/leagues"
+        params = {
+            "league_id": "40"
+        }
+        response = requests.get(self.url, params=params)
+        assert json.loads(response.text) == {"Error": "No Leagues Found"}
 
+    
+    def test_correct_leagues_endpoint_with_league_id(self):
+        """
+        This is a test where we test the CORRECT leagues retrieval specifying a league_id.
+        """
+        self.url += "/leagues"
+        params = {
+            "league_id": "5"
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
+
+    def test_correct_leagues_endpoint(self):
+        """
+        This is a test where we test the CORRECT league retrieval for all leagues.
+        """
+        self.url += "/leagues"
+        params = {
+          
+        }
+        response = requests.get(self.url, params=params)
+        assert len((response.text)) != 0
